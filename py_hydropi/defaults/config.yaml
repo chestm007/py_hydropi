@@ -51,15 +51,15 @@ water_pumps:
       - 11
     schedule:
       simple:
-        on: 5m
-        off: 15m
+        on_time: 5m
+        off_time: 15m
   group2:
     channels:
       - 14
     schedule:
       simple:
-        on: 5m
-        off: 15m
+        on_time: 5m
+        off_time: 15m
 
 air_pumps:
   group1:

@@ -19,7 +19,7 @@ class Timer(object):
         self.activated_time = None  # type: datetime
         self.deactivated_time = datetime.now()  # type: datetime
         self._continue = True  # set to false to exit self._timer_loop
-        self.timer_thread = Thread(target=self._timer_loop())
+        self.timer_thread = Thread(target=self._timer_loop)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
@@ -84,8 +84,8 @@ class Timer(object):
 
 class ClockTimer(Timer):
     def __init__(self, active_hours):
-        super().__init__()
         self.on_time, self.off_time = parse_clock_time_string(active_hours)
+        super().__init__()
 
     def _check_timer(self):
         now = datetime.now().strftime('%I:%M%p').lower()
@@ -116,10 +116,10 @@ class ClockTimer(Timer):
 
 
 class SimpleTimer(Timer):
-    def __init__(self, on, off):
+    def __init__(self, on_time, off_time):
+        self.on_time = parse_simple_time_string(on_time)  # type: int
+        self.off_time = parse_simple_time_string(off_time)  # type: int
         super().__init__()
-        self.on_time = parse_simple_time_string(on)  # type: int
-        self.off_time = parse_simple_time_string(off)  # type: int
 
     def _check_timer(self):
         now = datetime.now()
