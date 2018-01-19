@@ -80,7 +80,7 @@ class RaspberryPiTimer(object):
         while True:
             prev_trigger_len = len(triggers)
             for i, trigger_dict in enumerate(triggers):
-                for group, trigger in trigger_dict.items:
+                for group, trigger in trigger_dict.items():
                     group = ''.join(trigger.keys())
                     related_timer = self.db.timers.get(group)
                     if related_timer:
