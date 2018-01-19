@@ -27,10 +27,16 @@ class RaspberryPiTimer(object):
         for timer in self.db.timers.values():
             timer.start()
         while True:
-            recv_req = self.queue.get()
-            if recv_req == 'exit':
-                self.logger.log('recieved exit command. shutting down services.')
-                break
+            try:
+                recv_req = self.queue.get()
+                if recv_req == 'exit':
+                    self.logger.log('recieved exit command. shutting down services.')
+                    break
+            except KeyboardInterrupt:
+                self.logger.log('')
+                for timer in self.db.timers:
+                    timer.stop()
+
         for timer in self.db.timers.values():
             self.logger.log('Stopping timer for {}'.format(''.join(timer.keys())))
             timer.stop()
@@ -73,17 +79,18 @@ class RaspberryPiTimer(object):
         attached_triggers = []
         while True:
             prev_trigger_len = len(triggers)
-            for i, trigger in enumerate(triggers):
-                group = ''.join(trigger.keys())
-                related_timer = self.db.timers.get(group)
-                if related_timer:
-                    for output in trigger.get('outputs'):
-                        related_timer.attach_triggered_object(
-                            obj=output,
-                            group_name=trigger.get('output_type') + '.' + trigger.get('group'),
-                            before=trigger.get('before'),
-                            after=trigger.get('after'))
-                    attached_triggers.append(trigger)
+            for i, trigger_dict in enumerate(triggers):
+                for group, trigger in trigger_dict.items:
+                    group = ''.join(trigger.keys())
+                    related_timer = self.db.timers.get(group)
+                    if related_timer:
+                        for output in trigger.get('outputs'):
+                            related_timer.attach_triggered_object(
+                                obj=output,
+                                group_name=trigger.get('output_type') + '.' + trigger.get('group'),
+                                before=trigger.get('before'),
+                                after=trigger.get('after'))
+                        attached_triggers.append(trigger_dict)
             for trigger in attached_triggers:
                 triggers.remove(trigger)
             if len(triggers) == prev_trigger_len:
