@@ -62,8 +62,8 @@ class RaspberryPiTimer(object):
                             {
                                 schedule.get('object'):
                                     {
-                                        'before': schedule.get('before'),
-                                        'after': schedule.get('after'),
+                                        'before': schedule.get(''.join(schedule.keys())).get('before'),
+                                        'after': schedule.get(''.join(schedule.keys())).get('after'),
                                         'output_type': obj_type,
                                         'group': group,
                                         'outputs': group_outputs
