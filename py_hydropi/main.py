@@ -96,7 +96,7 @@ class RaspberryPiTimer(object):
             if len(triggers) == prev_trigger_len:
                 self.logger.warn(
                     'not all trigger schedules were consumed. unconsumed objects are \n{}'
-                    .format('\n'.join(triggers)))
+                    .format(triggers))
                 break
 
             if len(triggers) == 0:
