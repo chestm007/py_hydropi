@@ -1,0 +1,81 @@
+#
+### FILE SPECS
+#
+#
+# this file should be created in the following format:
+# object_type:  # lights|water_pumps|air_pumps
+#   group_name:  # any valid python variable
+#     channels:  # a list of channels belonging to this group
+#       - 1      # as integers.
+#     schedule:  # do not change this line
+#       timer:   # type of timer your using clock|simple|trigger
+#                #
+#                # clock:
+#                #   - '4:00am - 10:00pm'  # set your active time like this
+#                #
+#                # simple:
+#                #   on: 5m  # duration to keep this output on (d,h,m,s)
+#                #   off: 15m  # duration to leave this output off (d,h,m,s
+#                #
+#                # trigger:
+#                #   object: lights.group_name  # output type and group_name to depend on
+#                #   before: 5m  # turn on this amount of time before the dependancy (d,h,m,s)
+#                #   after: 5m  # turn off this amount of time after the dependancy (d,h,m,s)
+#
+##############################################################################################
+#
+# WORKING EXAMPLE yaml
+#
+lights:
+  group1:
+    channels:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+    schedule:
+      clock:
+        active_hours: '4:00am - 10:00pm'
+  group2:
+    channels:
+      - 6
+    schedule:
+      clock:
+        active_hours: '6:00am - 8:00pm'
+
+water_pumps:
+  group1:
+    channels:
+      - 10
+      - 11
+    schedule:
+      simple:
+        on: 5m
+        off: 15m
+  group2:
+    channels:
+      - 14
+    schedule:
+      simple:
+        on: 5m
+        off: 15m
+
+air_pumps:
+  group1:
+    channels:
+      - 12
+      - 13
+    schedule:
+      trigger:
+        object: water_pumps.group1
+        before: 5m
+        after: 5m
+  group2:
+    channels:
+      - 15
+    schedule:
+      trigger:
+        object: water_pumps.group2
+        before: 5m
+        after: 5m
