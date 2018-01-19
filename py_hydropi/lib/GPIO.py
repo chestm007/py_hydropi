@@ -13,7 +13,10 @@ class GPIO(object):
         self.GPIO.setup(int(channel), self.GPIO.IN, pull_up_down=pull_up_down or self.GPIO.PUD_DOWN)
 
     def setup_output_channel(self, channel: int, initial_state=False):
-        self.GPIO.setup(int(channel), self.GPIO.OUT, initial=initial_state)
+        try:
+            self.GPIO.setup(int(channel), self.GPIO.OUT, initial=initial_state)
+        except Exception:
+            print('error processing channel {}'.format(channel))
 
     def set_output_on(self, channel):
         self.GPIO.output(channel, True)
