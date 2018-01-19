@@ -53,7 +53,7 @@ class RaspberryPiTimer(object):
                     schedule = getattr(self.config, obj_type).get(group).get('schedule')
 
                     if ''.join(schedule.keys()) != 'trigger':
-                        timer = timer_factory(**schedule.get(''.join(schedule.keys())))
+                        timer = timer_factory(''.join(schedule.keys()), **schedule.get(''.join(schedule.keys())))
                         for output in group_outputs:
                             timer.attach_object(output)
                         self.db.timers[obj_type + '.' + group] = timer

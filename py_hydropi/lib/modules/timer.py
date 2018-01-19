@@ -5,7 +5,7 @@ from time import sleep
 from ..time_utils import parse_clock_time_string, parse_simple_time_string
 
 
-def timer_factory(timer_type, params):
+def timer_factory(timer_type, **params):
     if timer_type == 'clock':
         return ClockTimer(**params)
     if timer_type == 'simple':
