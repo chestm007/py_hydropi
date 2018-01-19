@@ -60,7 +60,7 @@ class RaspberryPiTimer(object):
                     else:
                         triggers.append(
                             {
-                                schedule.get('object'):
+                                schedule.get(''.join(schedule.keys())).get('object'):
                                     {
                                         'before': schedule.get(''.join(schedule.keys())).get('before'),
                                         'after': schedule.get(''.join(schedule.keys())).get('after'),
