@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from threading import Thread
 from time import sleep
-
+from ..logger import Logger
 from ..time_utils import parse_clock_time_string, parse_simple_time_string
 
 
@@ -13,6 +13,8 @@ def timer_factory(timer_type, **params):
 
 
 class Timer(object):
+    logger = Logger('Timer')
+
     def __init__(self):
         self.attached_outputs = []
         self.attached_triggered_outputs = {}
@@ -20,6 +22,8 @@ class Timer(object):
         self.deactivated_time = datetime.now()  # type: datetime
         self._continue = True  # set to false to exit self._timer_loop
         self.timer_thread = Thread(target=self._timer_loop)
+        self.outputs_activated = False
+        self.triggered_outputs_activated = False
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
@@ -28,20 +32,32 @@ class Timer(object):
         self.attached_outputs.append(obj)
 
     def _activate_objects(self):
-        for output in self.attached_outputs:
-            output.activate()
+        if not self.outputs_activated:
+            for output in self.attached_outputs:
+                self.logger.info('signalling output {} to activate'.format(output.channel))
+                self.logger.info(self.__dict__)
+                output.activate()
+            self.outputs_activated = True
 
     def _deactivate_objects(self):
-        for output in self.attached_outputs:
-            output.deactivate()
+        if self.outputs_activated:
+            for output in self.attached_outputs:
+                self.logger.info('signalling output {} to deactivate'.format(output.channel))
+                self.logger.info(self.__dict__)
+                output.deactivate()
+            self.outputs_activated = False
 
     def _activate_triggered_objects(self, group_name):
-        for output in self.attached_triggered_outputs[group_name]['objects']:
-            output.activate()
+        if not self.triggered_outputs_activated:
+            for output in self.attached_triggered_outputs[group_name]['objects']:
+                output.activate()
+            self.triggered_outputs_activated = True
 
     def _deactivate_triggered_objects(self, group_name):
-        for output in self.attached_triggered_outputs[group_name]['objects']:
-            output.deactivate()
+        if self.triggered_outputs_activated:
+            for output in self.attached_triggered_outputs[group_name]['objects']:
+                output.deactivate()
+            self.triggered_outputs_activated = False
 
     def attach_triggered_object(self, obj, group_name, before, after):
         if group_name in self.attached_triggered_outputs.keys():
@@ -88,10 +104,14 @@ class ClockTimer(Timer):
         super().__init__()
 
     def _check_timer(self):
-        now = datetime.now().strftime('%I:%M%p').lower()
-        if now == self.on_time:
+        now = datetime.now()
+        on_string = now.strftime('%b %d %Y {}'.format(self.on_time))
+        on_datetime = datetime.strptime(on_string, '%b %d %Y %I:%M%p')
+        off_string = now.strftime('%b %d %Y {}'.format(self.off_time))
+        off_datetime = datetime.strptime(off_string, '%b %d %Y %I:%M%p')
+        if now > on_datetime:
             self._activate_objects()
-        elif now == self.off_time:
+        elif now > off_datetime:
             self._deactivate_objects()
 
     def _check_before_trigger(self):
@@ -101,7 +121,7 @@ class ClockTimer(Timer):
             on_datetime = datetime.strptime(on_string, '%b %d %Y %I:%M%p')
             if on_datetime < now:
                 on_datetime += timedelta(days=1)
-            if on_datetime - timedelta(minutes=opts['before']) > now:
+            if on_datetime - timedelta(seconds=opts['before']) > now:
                 self._activate_triggered_objects(group_name)
 
     def _check_after_trigger(self):
@@ -111,7 +131,7 @@ class ClockTimer(Timer):
             off_datetime = datetime.strptime(off_string, '%b %d %Y %I:%M%p')
             if off_datetime < now:
                 off_datetime += timedelta(days=1)
-            if off_datetime + timedelta(minutes=opts['after']) > now:
+            if off_datetime + timedelta(seconds=opts['after']) > now:
                 self._deactivate_triggered_objects(group_name)
 
 
@@ -123,28 +143,30 @@ class SimpleTimer(Timer):
 
     def _check_timer(self):
         now = datetime.now()
-        if self.deactivated_time is not None:
-            if self.deactivated_time + timedelta(minutes=self.off_time) > now:
+        if not self.outputs_activated:
+            if self.deactivated_time + timedelta(seconds=self.off_time) < now:
                 self.activated_time = datetime.now()
-                self.deactivated_time = None
-                for output in self.attached_outputs:
-                    output.activate()
+                #self.deactivated_time = None
+                self._activate_objects()
 
-        elif self.activated_time is not None:
-            if self.activated_time + timedelta(minutes=self.on_time) > now:
+        else:
+            if self.activated_time + timedelta(seconds=self.on_time) < now:
                 self.deactivated_time = datetime.now()
-                self.activated_time = None
-                for output in self.attached_outputs:
-                    output.deactivate()
+                #self.activated_time = None
+                self._deactivate_objects()
 
     def _check_before_trigger(self):
         for group_name, opts in self.attached_triggered_outputs.items():
-            now = datetime.now()
-            if self.deactivated_time + timedelta(minutes=self.off_time) - timedelta(minutes=opts['before']) > now:
-                self._activate_triggered_objects(group_name)
+            if not self.triggered_outputs_activated:
+                if self.deactivated_time:
+                    now = datetime.now()
+                    if self.deactivated_time + timedelta(seconds=self.off_time) - timedelta(seconds=opts['before']) < now:
+                        self._activate_triggered_objects(group_name)
 
     def _check_after_trigger(self):
         for group_name, opts in self.attached_triggered_outputs.items():
-            now = datetime.now()
-            if self.activated_time + timedelta(minutes=self.on_time) + timedelta(minutes=opts['after']) > now:
-                self._deactivate_triggered_objects(group_name)
+            if self.triggered_outputs_activated:
+                if self.activated_time:
+                    now = datetime.now()
+                    if self.activated_time + timedelta(seconds=self.on_time) + timedelta(seconds=opts['after']) < now:
+                        self._deactivate_triggered_objects(group_name)

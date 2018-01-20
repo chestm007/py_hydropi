@@ -11,11 +11,11 @@
 #       timer:   # type of timer your using clock|simple|trigger
 #                #
 #                # clock:
-#                #   - '4:00am - 10:00pm'  # set your active time like this
+#                #   active_hours '4:00am - 10:00pm'  # set your active time like this
 #                #
 #                # simple:
-#                #   on: 5m  # duration to keep this output on (d,h,m,s)
-#                #   off: 15m  # duration to leave this output off (d,h,m,s
+#                #   on_time: 5m  # duration to keep this output on (d,h,m,s)
+#                #   off_time: 15m  # duration to leave this output off (d,h,m,s
 #                #
 #                # trigger:
 #                #   object: lights.group_name  # output type and group_name to depend on
@@ -52,7 +52,7 @@ water_pumps:
     schedule:
       simple:
         on_time: 5m
-        off_time: 15m
+        off_time: 15s
   group2:
     channels:
       - 14

@@ -12,7 +12,7 @@ def parse_clock_time_string(string):
 
 
 def parse_simple_time_string(string):
-    total_mins = 0
+    total_secs = 0
     time_pattern = (
         '((?P<d>\d+){0})?((?P<h>\d+){1})?((?P<m>\d+){2})?((?P<s>\d+){3})?'.format(DAYS, HOURS, MINUTES, SECONDS))
     pattern = re.compile(time_pattern)
@@ -20,11 +20,11 @@ def parse_simple_time_string(string):
     found = pattern.search(string)
     if found:
         if found.group(SECONDS):
-            total_mins += int(found.group(SECONDS)) / 60
+            total_secs += int(found.group(SECONDS))
         if found.group(MINUTES):
-            total_mins += int(found.group(MINUTES))
+            total_secs += int(found.group(MINUTES)) * 60
         if found.group(HOURS):
-            total_mins += int(found.group(HOURS)) * 60
+            total_secs += int(found.group(HOURS)) * 60 * 60
         if found.group(DAYS):
-            total_mins += int(found.group(DAYS)) * 24 * 60
-    return total_mins
+            total_secs += int(found.group(DAYS)) * 24 * 60 * 60
+    return total_secs

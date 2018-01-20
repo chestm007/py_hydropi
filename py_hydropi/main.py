@@ -1,10 +1,6 @@
 from multiprocessing import Queue
 
-from py_hydropi.lib.logger import Logger
-from py_hydropi.lib.modules.outputs import Output
-from py_hydropi.lib.modules.timer import timer_factory
-from .lib.config import Config
-from .lib.GPIO import GPIO
+from .lib import Logger, Output, timer_factory, Config, GPIO
 
 
 class MemDatabase(object):
@@ -17,10 +13,11 @@ class MemDatabase(object):
 
 
 class RaspberryPiTimer(object):
-    def __init__(self, *_, logger=None):
+    logger = Logger('RaspberryPiTimer')
+
+    def __init__(self):
         self.gpio = GPIO()
         self.config = Config()
-        self.logger = Logger()
         self.queue = Queue()
         self.db = MemDatabase()
         self.setup_outputs()
@@ -33,12 +30,16 @@ class RaspberryPiTimer(object):
                     self.logger.log('recieved exit command. shutting down services.')
                     break
             except KeyboardInterrupt:
-                self.logger.log('')
+                self.logger.log('Detected KeyboardInterupt in queue loop, exiting gracefully')
                 for timer in self.db.timers:
                     timer.stop()
 
         for timer in self.db.timers.values():
             self.logger.log('Stopping timer for {}'.format(''.join(timer.keys())))
+            timer.stop()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for timer in self.db.timers:
             timer.stop()
 
     def setup_outputs(self):
@@ -81,7 +82,7 @@ class RaspberryPiTimer(object):
             prev_trigger_len = len(triggers)
             for i, trigger_dict in enumerate(triggers):
                 for group, trigger in trigger_dict.items():
-                    group = ''.join(trigger.keys())
+                    group = ''.join(trigger_dict.keys())
                     related_timer = self.db.timers.get(group)
                     if related_timer:
                         for output in trigger.get('outputs'):
@@ -104,8 +105,7 @@ class RaspberryPiTimer(object):
 
 
 def main():
-    logger = Logger()
-    rpi_timer = RaspberryPiTimer(logger)
+    rpi_timer = RaspberryPiTimer()
 
 
 if __name__ == '__main__':
