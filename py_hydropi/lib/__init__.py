@@ -1,6 +1,6 @@
 from .modules.outputs import Output
 from .modules.timer import Timer, timer_factory
-from .config import Config
+from .config import ModuleConfig
 from .GPIO import GPIO
 from .logger import Logger
 from .python_extras import AttrDict

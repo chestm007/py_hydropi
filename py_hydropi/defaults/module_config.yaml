@@ -3,7 +3,7 @@
 #
 #
 # this file should be created in the following format:
-# object_type:  # lights|water_pumps|air_pumps
+# object_type:   # lights|water_pumps|air_pumps
 #   group_name:  # any valid python variable
 #     channels:  # a list of channels belonging to this group
 #       - 1      # as integers.
@@ -15,7 +15,7 @@
 #                #
 #                # simple:
 #                #   on_time: 5m  # duration to keep this output on (d,h,m,s)
-#                #   off_time: 15m  # duration to leave this output off (d,h,m,s
+#                #   off_time: 15m  # duration to leave this output off (d,h,m,s)
 #                #
 #                # trigger:
 #                #   object: lights.group_name  # output type and group_name to depend on
@@ -52,7 +52,7 @@ water_pumps:
     schedule:
       simple:
         on_time: 5m
-        off_time: 15s
+        off_time: 15m
   group2:
     channels:
       - 14
@@ -69,13 +69,13 @@ air_pumps:
     schedule:
       trigger:
         object: water_pumps.group1
-        before: 5m
-        after: 5m
+        before: 10s
+        after: 10s
   group2:
     channels:
       - 15
     schedule:
       trigger:
         object: water_pumps.group2
-        before: 5m
-        after: 5m
+        before: 10s
+        after: 10s

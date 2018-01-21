@@ -16,6 +16,7 @@ class Output(object):
         power the GPIO channel associated with this output
         """
         self.logger.info('activate signal recieved for channel {}. Signalling GPIO'.format(self.channel))
+        self.state = True
         self.gpio.set_output_on(self.channel)
 
     def deactivate(self):
@@ -23,4 +24,8 @@ class Output(object):
         de-power the GPIO channel associated with this output
         """
         self.logger.info('deactivate signal recieved for channel {}. Signalling GPIO'.format(self.channel))
+        self.state = False
         self.gpio.set_output_off(self.channel)
+
+    def toJSON(self):
+        return {'channel': self.channel, 'state': self.state}

@@ -1,15 +1,11 @@
 from multiprocessing import Queue
 
-from .lib import Logger, Output, timer_factory, Config, GPIO
+from py_hydropi.lib.config import ApiConfig
+from py_hydropi.lib.memdatabase import MemDatabase
 
+from .lib.API.main import ApiServer
 
-class MemDatabase(object):
-    def __init__(self):
-        self.lights = {}       # {'group_name': [Output(), Output(), ...]}
-        self.air_pumps = {}    # {'group_name': [Output(), Output(), ...]}
-        self.water_pumps = {}  # {'group_name': [Output(), Output(), ...]}
-        self.groups = []       # ['group_name', 'group_name', ...]
-        self.timers = {}       # {'output_type.group_name': Timer()}
+from .lib import Logger, Output, timer_factory, ModuleConfig, GPIO
 
 
 class RaspberryPiTimer(object):
@@ -17,9 +13,13 @@ class RaspberryPiTimer(object):
 
     def __init__(self):
         self.gpio = GPIO()
-        self.config = Config()
+        self.module_config = ModuleConfig()
+        self.api_config = ApiConfig()
         self.queue = Queue()
         self.db = MemDatabase()
+        self.Api = ApiServer(self.db)
+        self.Api.load_config(self.api_config)
+        self.Api.start()
         self.setup_outputs()
         for timer in self.db.timers.values():
             timer.start()
@@ -45,19 +45,19 @@ class RaspberryPiTimer(object):
     def setup_outputs(self):
         triggers = []
         for obj_type in ('lights', 'water_pumps', 'air_pumps'):
-            if hasattr(self.config, obj_type):
-                for group in getattr(self.config, obj_type).keys():
+            if hasattr(self.module_config, obj_type):
+                for group in getattr(self.module_config, obj_type).keys():
                     group_outputs = []
                     if group not in self.db.groups:
                         self.db.groups.append(group)
-                    for channel in getattr(self.config, obj_type).get(group).get('channels'):
+                    for channel in getattr(self.module_config, obj_type).get(group).get('channels'):
                         output = Output(gpio=self.gpio, channel=channel)
                         group_outputs.append(output)
                         if getattr(self.db, obj_type).get(group) is not None:
                             getattr(self.db, obj_type).get(group).append(output)
                         else:
                             getattr(self.db, obj_type)[group] = [output]
-                    schedule = getattr(self.config, obj_type).get(group).get('schedule')
+                    schedule = getattr(self.module_config, obj_type).get(group).get('schedule')
 
                     if ''.join(schedule.keys()) != 'trigger':
                         timer = timer_factory(''.join(schedule.keys()), **schedule.get(''.join(schedule.keys())))

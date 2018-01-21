@@ -1,0 +1,4 @@
+# accept connections from this port only
+strict_port_checking: yes
+listen_address: 0.0.0.0
+port: 8084

@@ -4,7 +4,8 @@ from setuptools import find_packages
 
 required_packages = [
     'RPi.GPIO',
-    'PyYAML'
+    'PyYAML',
+    'cherrypy'
 ]
 
 setup(

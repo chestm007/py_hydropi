@@ -97,6 +97,24 @@ class Timer(object):
             self._check_before_trigger()
             sleep(0.5)
 
+    def toJSON(self):
+        return {
+            'attached_outputs': [o.toJSON() for o in self.attached_outputs],
+            'attached_triggered_outputs': self._decode_attached_triggered_outputs(),
+            'active': self._continue,
+            'outputs_activated': self.outputs_activated,
+            'triggered_outputs_activated': self.triggered_outputs_activated
+        }
+
+    def _decode_attached_triggered_outputs(self):
+        out_dict = {}
+        for group_name, param_dict in self.attached_triggered_outputs.items():
+            out_dict[group_name] = {'before': param_dict.get('before'),
+                                    'after': param_dict.get('after'),
+                                    'objects': [o.toJSON() for o in param_dict.get('objects')]
+                                    }
+        return out_dict
+
 
 class ClockTimer(Timer):
     def __init__(self, active_hours):
@@ -146,13 +164,11 @@ class SimpleTimer(Timer):
         if not self.outputs_activated:
             if self.deactivated_time + timedelta(seconds=self.off_time) < now:
                 self.activated_time = datetime.now()
-                #self.deactivated_time = None
                 self._activate_objects()
 
         else:
             if self.activated_time + timedelta(seconds=self.on_time) < now:
                 self.deactivated_time = datetime.now()
-                #self.activated_time = None
                 self._deactivate_objects()
 
     def _check_before_trigger(self):
