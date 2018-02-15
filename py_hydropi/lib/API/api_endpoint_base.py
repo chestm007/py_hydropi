@@ -4,6 +4,7 @@ import cherrypy
 
 class APIEndpointBase(object):
     exposed = True
+    error_405 = cherrypy.HTTPError(405, None)
 
     def __init__(self, api):
         self.api = api  # type: ApiServer
@@ -12,23 +13,29 @@ class APIEndpointBase(object):
     def GET(self):
         return self._get()
 
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
     def POST(self):
-        return self._post()
+        return self._post(cherrypy.request.json)
 
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
     def PUT(self):
-        return self._put()
+        return self._put(cherrypy.request.json)
 
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
     def DELETE(self):
-        return self._delete()
+        return self._delete(cherrypy.request.json)
 
-    def _delete(self):
-        raise cherrypy._cperror.HTTPError(405, None)
+    def _delete(self, data):
+        raise self.error_405
 
-    def _put(self):
-        raise cherrypy._cperror.HTTPError(405, None)
+    def _put(self, data):
+        raise self.error_405
 
-    def _post(self):
-        raise cherrypy._cperror.HTTPError(405, None)
+    def _post(self, data):
+        raise self.error_405
 
     def _get(self):
-        raise cherrypy._cperror.HTTPError(405, None)
+        raise self.error_405

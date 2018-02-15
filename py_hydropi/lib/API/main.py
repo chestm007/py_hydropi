@@ -28,12 +28,14 @@ class ApiServer(object):
         cherrypy.log.error_log.propagate = False
         cherrypy._cpchecker.Checker.on = False  # stops cherrypy checking for config
         cherrypy.engine.signals.subscribe()
-        cherrypy.engine.start()
         cherrypy.log.access_log.log = self.logger.log
         cherrypy.log.access_log.propagate = False
         self.is_running = True
+        cherrypy.engine.start()
 
     def stop(self):
+        self.logger.info('exiting')
+        self.db.server_queue.put('exit')
         if self.is_running:
             cherrypy.engine.exit()
             self.is_running = False
@@ -52,19 +54,24 @@ class ApiServer(object):
         if endpoint_dir is None:
             endpoint_dir = (os.path.join(os.path.dirname(os.path.realpath(__file__)), 'endpoints'))
         for found in os.listdir(endpoint_dir):
-            dir = os.path.join(endpoint_dir, found)
-            if found != '__init__.py':
-                if os.path.isdir(dir):
-                    self.lazy_load_endpoints(dir)
+            _endpoint_dir = os.path.join(endpoint_dir, found)
+            if found not in ['__init__.py', '__pycache__']:
+                if os.path.isdir(_endpoint_dir):
+                    self.lazy_load_endpoints(_endpoint_dir)
                 else:
-                    endpoint = '/' + str(dir.split('endpoints/')[1].replace(found, ''))
-                    imp_dir = 'py_hydropi' + str(dir).split('py_hydropi')[2].replace('/', '.').replace('.py', '')
-                    module = __import__(str(imp_dir), fromlist=[found])
+                    endpoint = '/' + str(_endpoint_dir.split('endpoints/')[1]).replace(found, '')
+                    imp_dir = 'py_hydropi' + str(
+                        _endpoint_dir).split('py_hydropi')[2].replace('/', '.').replace('.py', '')
+                    mod = __import__(str(imp_dir), fromlist=[found])
                     found = ''.join([str(i.capitalize()) for i in found.replace('.py', '').split('_')])
-                    class_ = getattr(module, found)
+                    class_ = getattr(mod, found)
                     instance = class_(self)
                     cherrypy.tree.mount(instance, endpoint,
                                         {
                                             '/': {
-                                                'request.dispatch': cherrypy.dispatch.MethodDispatcher()}})
+                                                'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+                                                'tools.response_headers.on': True,
+                                                'tools.response_headers.headers': [('Content-Type', 'text/plain')]
+                                            }
+                                        })
 

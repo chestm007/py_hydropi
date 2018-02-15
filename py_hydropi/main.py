@@ -16,30 +16,36 @@ class RaspberryPiTimer(object):
         self.module_config = ModuleConfig()
         self.api_config = ApiConfig()
         self.queue = Queue()
-        self.db = MemDatabase()
+        self.db = MemDatabase(self.queue)
+        self.db.gpio = self.gpio
         self.Api = ApiServer(self.db)
         self.Api.load_config(self.api_config)
-        self.Api.start()
         self.setup_outputs()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+
+    def start(self):
+        self.Api.start()
         for timer in self.db.timers.values():
             timer.start()
+        self._queue_loop()
+
+    def _queue_loop(self):
         while True:
             try:
                 recv_req = self.queue.get()
                 if recv_req == 'exit':
-                    self.logger.log('recieved exit command. shutting down services.')
+                    self.logger.info('recieved exit command. shutting down services.')
                     break
             except KeyboardInterrupt:
-                self.logger.log('Detected KeyboardInterupt in queue loop, exiting gracefully')
-                for timer in self.db.timers:
-                    timer.stop()
+                self.logger.info('Detected KeyboardInterupt in queue loop, exiting gracefully')
+                self.stop()
 
+    def stop(self):
+        self.Api.stop()
         for timer in self.db.timers.values():
-            self.logger.log('Stopping timer for {}'.format(''.join(timer.keys())))
-            timer.stop()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        for timer in self.db.timers:
+            self.logger.info('Stopping timer for {}'.format(''.join(timer.keys())))
             timer.stop()
 
     def setup_outputs(self):
@@ -106,6 +112,7 @@ class RaspberryPiTimer(object):
 
 def main():
     rpi_timer = RaspberryPiTimer()
+    rpi_timer.start()
 
 
 if __name__ == '__main__':

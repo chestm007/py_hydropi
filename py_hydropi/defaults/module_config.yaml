@@ -51,8 +51,8 @@ water_pumps:
       - 11
     schedule:
       simple:
-        on_time: 5m
-        off_time: 15m
+        on_time: 20s
+        off_time: 20s
   group2:
     channels:
       - 14
@@ -69,13 +69,13 @@ air_pumps:
     schedule:
       trigger:
         object: water_pumps.group1
-        before: 10s
-        after: 10s
+        before: 5s
+        after: 5s
   group2:
     channels:
       - 15
     schedule:
       trigger:
         object: water_pumps.group2
-        before: 10s
-        after: 10s
+        before: 5s
+        after: 5s

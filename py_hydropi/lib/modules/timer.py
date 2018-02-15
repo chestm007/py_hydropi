@@ -21,9 +21,9 @@ class Timer(object):
         self.activated_time = None  # type: datetime
         self.deactivated_time = datetime.now()  # type: datetime
         self._continue = True  # set to false to exit self._timer_loop
-        self.timer_thread = Thread(target=self._timer_loop)
         self.outputs_activated = False
         self.triggered_outputs_activated = False
+        self.timer_thread = None
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
@@ -34,30 +34,42 @@ class Timer(object):
     def _activate_objects(self):
         if not self.outputs_activated:
             for output in self.attached_outputs:
-                self.logger.info('signalling output {} to activate'.format(output.channel))
-                self.logger.info(self.__dict__)
-                output.activate()
+                if output.manual_control:
+                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
+                else:
+                    self.logger.info('signalling output {} to activate'.format(output.channel))
+                    output.activate()
             self.outputs_activated = True
 
     def _deactivate_objects(self):
         if self.outputs_activated:
             for output in self.attached_outputs:
-                self.logger.info('signalling output {} to deactivate'.format(output.channel))
-                self.logger.info(self.__dict__)
-                output.deactivate()
+                if output.manual_control:
+                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
+                else:
+                    self.logger.info('signalling output {} to deactivate'.format(output.channel))
+                    output.deactivate()
             self.outputs_activated = False
 
     def _activate_triggered_objects(self, group_name):
         if not self.triggered_outputs_activated:
             for output in self.attached_triggered_outputs[group_name]['objects']:
-                output.activate()
-            self.triggered_outputs_activated = True
+                if output.manual_control:
+                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
+                else:
+                    self.logger.info('signalling output {} to activate'.format(output.channel))
+                    output.activate()
+                self.triggered_outputs_activated = True
 
     def _deactivate_triggered_objects(self, group_name):
         if self.triggered_outputs_activated:
             for output in self.attached_triggered_outputs[group_name]['objects']:
-                output.deactivate()
-            self.triggered_outputs_activated = False
+                if output.manual_control:
+                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
+                else:
+                    self.logger.info('signalling output {} to deactivate'.format(output.channel))
+                    output.deactivate()
+                self.triggered_outputs_activated = False
 
     def attach_triggered_object(self, obj, group_name, before, after):
         if group_name in self.attached_triggered_outputs.keys():
@@ -84,11 +96,14 @@ class Timer(object):
         raise NotImplementedError()
 
     def start(self):
+        self.timer_thread = Thread(target=self._timer_loop)
         self.timer_thread.start()
 
     def stop(self):
+        self._deactivate_objects()
+        for group in self.attached_triggered_outputs.keys():
+            self._deactivate_triggered_objects(group)
         self._continue = False
-        self.timer_thread.join()
 
     def _timer_loop(self):
         while self._continue:
@@ -96,10 +111,11 @@ class Timer(object):
             self._check_after_trigger()
             self._check_before_trigger()
             sleep(0.5)
+        self.stop()
 
-    def toJSON(self):
+    def to_json(self):
         return {
-            'attached_outputs': [o.toJSON() for o in self.attached_outputs],
+            'attached_outputs': [o.to_json() for o in self.attached_outputs],
             'attached_triggered_outputs': self._decode_attached_triggered_outputs(),
             'active': self._continue,
             'outputs_activated': self.outputs_activated,
@@ -111,7 +127,7 @@ class Timer(object):
         for group_name, param_dict in self.attached_triggered_outputs.items():
             out_dict[group_name] = {'before': param_dict.get('before'),
                                     'after': param_dict.get('after'),
-                                    'objects': [o.toJSON() for o in param_dict.get('objects')]
+                                    'objects': [o.to_json() for o in param_dict.get('objects')]
                                     }
         return out_dict
 

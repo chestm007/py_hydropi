@@ -6,15 +6,14 @@ from .python_extras import AttrDict
 MODULE_CONFIG_FILENAME = 'module_config.yaml'
 API_CONFIG_FILENAME = 'api_config.yaml' \
                       ''
-if os.environ['PY_HYDROPI_TESTING'] == 'true':
-    print(os.path.curdir)
-    config_dir = 'py_hydropi/defaults/'
+if os.environ.get('PY_HYDROPI_TESTING') == 'true':
+    default_config_dir = 'py_hydropi/defaults/'
 else:
-    config_dir = '/etc/py_hydropi/'
+    default_config_dir = '/etc/py_hydropi/'
 
 
 class BaseConfig(object):
-    def __init__(self, config_dir=config_dir):
+    def __init__(self, config_dir=default_config_dir):
         assert '.yaml' in config_dir
 
         path = '/'.join(a for a in config_dir.split('/') if not a.endswith('.yaml'))
@@ -32,7 +31,7 @@ class BaseConfig(object):
 
 
 class ModuleConfig(BaseConfig):
-    def __init__(self, config_dir=config_dir):
+    def __init__(self, config_dir=default_config_dir):
         config_dir = config_dir + MODULE_CONFIG_FILENAME
         super().__init__(config_dir)
 
@@ -46,7 +45,7 @@ class ModuleConfig(BaseConfig):
 
 
 class ApiConfig(BaseConfig):
-    def __init__(self, config_dir=config_dir):
+    def __init__(self, config_dir=default_config_dir):
         config_dir = config_dir + API_CONFIG_FILENAME
         super().__init__(config_dir)
 
