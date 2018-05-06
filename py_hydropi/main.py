@@ -45,7 +45,7 @@ class RaspberryPiTimer(object):
     def stop(self):
         self.Api.stop()
         for timer in self.db.timers.values():
-            self.logger.info('Stopping timer for {}'.format(''.join(timer.keys())))
+            self.logger.info('Stopping timer for {}'.format(''.join(timer.to_json())))
             timer.stop()
 
     def setup_outputs(self):
