@@ -30,7 +30,7 @@ else:
         def setup(channel, input_output, pull_up_down=None, initial=None):
             assert type(channel) == int
             assert (isinstance(input_output, RPIGPIO.In) or isinstance(input_output, RPIGPIO.Out))
-            assert pull_up_down is not None or initial is not None
+            #assert pull_up_down is not None or initial is not None
 
         @staticmethod
         def output(channel, state):

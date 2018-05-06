@@ -19,7 +19,7 @@ class Timer(object):
         self.attached_outputs = []
         self.attached_triggered_outputs = {}
         self.activated_time = None  # type: datetime
-        self.deactivated_time = datetime.now()  # type: datetime
+        self.deactivated_time = None  # type: datetime
         self._continue = True  # set to false to exit self._timer_loop
         self.outputs_activated = False
         self.triggered_outputs_activated = False
@@ -31,7 +31,7 @@ class Timer(object):
     def attach_object(self, obj):
         self.attached_outputs.append(obj)
 
-    def _activate_objects(self):
+    def _activate_objects(self, activated_time=None):
         if not self.outputs_activated:
             for output in self.attached_outputs:
                 if output.manual_control:
@@ -40,8 +40,10 @@ class Timer(object):
                     self.logger.info('signalling output {} to activate'.format(output.channel))
                     output.activate()
             self.outputs_activated = True
+            self.activated_time = activated_time or datetime.now()
+            self.deactivated_time = None
 
-    def _deactivate_objects(self):
+    def _deactivate_objects(self, deactivated_time=None):
         if self.outputs_activated:
             for output in self.attached_outputs:
                 if output.manual_control:
@@ -50,6 +52,8 @@ class Timer(object):
                     self.logger.info('signalling output {} to deactivate'.format(output.channel))
                     output.deactivate()
             self.outputs_activated = False
+            self.deactivated_time = deactivated_time or datetime.now()
+            self.activated_time = None
 
     def _activate_triggered_objects(self, group_name):
         if not self.triggered_outputs_activated:
@@ -110,7 +114,7 @@ class Timer(object):
             self._check_timer()
             self._check_after_trigger()
             self._check_before_trigger()
-            sleep(0.5)
+            sleep(0.1)
         self.stop()
 
     def to_json(self):
@@ -139,14 +143,16 @@ class ClockTimer(Timer):
 
     def _check_timer(self):
         now = datetime.now()
-        on_string = now.strftime('%b %d %Y {}'.format(self.on_time))
-        on_datetime = datetime.strptime(on_string, '%b %d %Y %I:%M%p')
-        off_string = now.strftime('%b %d %Y {}'.format(self.off_time))
-        off_datetime = datetime.strptime(off_string, '%b %d %Y %I:%M%p')
-        if now > on_datetime:
-            self._activate_objects()
-        elif now > off_datetime:
-            self._deactivate_objects()
+        if self.outputs_activated:
+            off_string = now.strftime('%b %d %Y {}'.format(self.off_time))
+            off_datetime = datetime.strptime(off_string, '%b %d %Y %I:%M%p')
+            if now > off_datetime and (self.activated_time is None or off_datetime > self.activated_time):
+                self._deactivate_objects(off_datetime)
+        else:
+            on_string = now.strftime('%b %d %Y {}'.format(self.on_time))
+            on_datetime = datetime.strptime(on_string, '%b %d %Y %I:%M%p')
+            if now > on_datetime and (self.deactivated_time is None or on_datetime > self.deactivated_time):
+                self._activate_objects(on_datetime)
 
     def _check_before_trigger(self):
         for group_name, opts in self.attached_triggered_outputs.items():
@@ -178,12 +184,12 @@ class SimpleTimer(Timer):
     def _check_timer(self):
         now = datetime.now()
         if not self.outputs_activated:
-            if self.deactivated_time + timedelta(seconds=self.off_time) < now:
+            if self.deactivated_time is None or self.deactivated_time + timedelta(seconds=self.off_time) < now:
                 self.activated_time = datetime.now()
                 self._activate_objects()
 
         else:
-            if self.activated_time + timedelta(seconds=self.on_time) < now:
+            if self.activated_time is None or self.activated_time + timedelta(seconds=self.on_time) < now:
                 self.deactivated_time = datetime.now()
                 self._deactivate_objects()
 
