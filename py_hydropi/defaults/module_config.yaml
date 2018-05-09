@@ -36,13 +36,13 @@ lights:
       - 5
     schedule:
       clock:
-        active_hours: '4:00am - 10:00pm'
+        active_hours: '2:09am - 2:14am'
   group2:
     channels:
       - 6
     schedule:
       clock:
-        active_hours: '6:00am - 8:00pm'
+        active_hours: '1:54am - 3:00am'
 
 water_pumps:
   group1:

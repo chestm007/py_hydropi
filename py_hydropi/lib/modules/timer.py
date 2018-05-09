@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from threading import Thread
 from time import sleep
+
+from py_hydropi.lib.modules.switch import Switch
 from ..logger import Logger
 from ..time_utils import parse_clock_time_string, parse_simple_time_string
 
@@ -12,45 +14,32 @@ def timer_factory(timer_type, **params):
         return SimpleTimer(**params)
 
 
-class Timer(object):
+class Timer(Switch):
     logger = Logger('Timer')
 
     def __init__(self):
-        self.attached_outputs = []
+        super().__init__()
         self.attached_triggered_outputs = {}
-        self.activated_time = None  # type: datetime
-        self.deactivated_time = None  # type: datetime
-        self._continue = True  # set to false to exit self._timer_loop
-        self.outputs_activated = False
+        self._continue = None  # set to false to exit self._timer_loop
         self.triggered_outputs_activated = False
         self.timer_thread = None
+        self.outputs_activated = None
+        self.activated_time = None  # type: datetime
+        self.deactivated_time = None  # type: datetime
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
 
-    def attach_object(self, obj):
-        self.attached_outputs.append(obj)
-
-    def _activate_objects(self, activated_time=None):
+    def _activate_objects(self, activated_time=None, objects=None):
         if not self.outputs_activated:
-            for output in self.attached_outputs:
-                if output.manual_control:
-                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
-                else:
-                    self.logger.info('signalling output {} to activate'.format(output.channel))
-                    output.activate()
+            super()._activate_objects()
             self.outputs_activated = True
             self.activated_time = activated_time or datetime.now()
             self.deactivated_time = None
 
-    def _deactivate_objects(self, deactivated_time=None):
+    def _deactivate_objects(self, deactivated_time=None, objects=None):
         if self.outputs_activated:
-            for output in self.attached_outputs:
-                if output.manual_control:
-                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
-                else:
-                    self.logger.info('signalling output {} to deactivate'.format(output.channel))
-                    output.deactivate()
+            super()._deactivate_objects()
             self.outputs_activated = False
             self.deactivated_time = deactivated_time or datetime.now()
             self.activated_time = None
@@ -100,6 +89,7 @@ class Timer(object):
         raise NotImplementedError()
 
     def start(self):
+        self._continue = True
         self.timer_thread = Thread(target=self._timer_loop)
         self.timer_thread.start()
 
