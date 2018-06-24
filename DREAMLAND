@@ -1,0 +1,64 @@
+group1:
+  lights
+    channels:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+    schedule:
+      clock:
+        active_hours: '4:00am - 10:00pm'
+
+  water_pumps:
+    channels:
+      - 10
+      - 11
+    schedule:
+      simple:
+        on_time: 20s
+        off_time: 20s
+
+  air_pumps:
+    channels:
+      - 12
+      - 13
+    schedule:
+      trigger:
+        object: group1.water_pumps
+        before: 5s
+        after: 5s
+
+group2:
+  lights:
+    channels:
+      - 6
+    schedule:
+      clock:
+        active_hours: '6:00am - 8:00pm'
+
+  water_pumps:
+    channels:
+      - 14
+    schedule:
+      simple:
+        on_time: 5m
+        off_time: 15m
+
+  air_pumps:
+    channels:
+      - 15
+    schedule:
+      trigger:
+        object: group2.water_pumps
+        before: 5s
+        after: 5s
+
+groups = {
+    <name>: {
+        'timer': Timer(),
+        'outputs': [
+            Output(), ...
+        ]
+    }
+}

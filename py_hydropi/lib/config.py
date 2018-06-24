@@ -1,6 +1,5 @@
 import yaml
 import os
-from .python_extras import AttrDict
 
 
 MODULE_CONFIG_FILENAME = 'module_config.yaml'
@@ -37,11 +36,11 @@ class ModuleConfig(BaseConfig):
 
     def _load_config(self):
         with open(self.config_dir + '/' + self.filename, 'r') as config_yaml:
-            config = yaml.load(config_yaml)
-            config = AttrDict(config)
-            self.lights = config.lights  # type: list
-            self.water_pumps = config.water_pumps  # type: list
-            self.air_pumps = config.air_pumps  # type: list
+            #self.groups = yaml.load(config_yaml)
+            self.config = yaml.load(config_yaml)
+            self.lights = self.config.get('lights')  # type: list
+            self.water_pumps = self.config.get('water_pumps')  # type: list
+            self.air_pumps = self.config.get('air_pumps')  # type: list
 
 
 class ApiConfig(BaseConfig):
@@ -52,7 +51,7 @@ class ApiConfig(BaseConfig):
     def _load_config(self):
         with open(self.config_dir + '/' + self.filename, 'r') as config_yaml:
             config = yaml.load(config_yaml)
-            config = AttrDict(config)
-            self.strict_port_checking = config.strict_port_checking
-            self.listen_address = config.listen_address
-            self.port = config.port
+            self.strict_port_checking = config.get('strict_port_checking')
+            self.listen_address = config.get('listen_address')
+            self.port = config.get('port')
+            self.start = config.get('start')

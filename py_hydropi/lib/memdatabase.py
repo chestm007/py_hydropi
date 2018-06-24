@@ -5,6 +5,7 @@ class MemDatabase(object):
         self.water_pumps = {}  # {'group_name': [Output(), Output(), ...]}
         self.groups = []       # ['group_name', 'group_name', ...]
         self.timers = {}       # {'output_type.group_name': Timer()}
+        self.controllers = {}
         self.gpio = None
         self.server_queue = queue
 

@@ -1,11 +1,11 @@
 from ..logger import Logger
 
 
-class Output(object):
-    logger = Logger('Output')
+class Output:
     types = ('lights', 'water_pumps', 'air_pumps')
 
     def __init__(self, gpio, channel: int, initial_state=False, output_type=None):
+        self.logger = Logger(self.__class__.__name__)
         super().__init__()
         self.gpio = gpio
         self.channel = int(channel)

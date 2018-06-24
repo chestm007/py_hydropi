@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from threading import Thread
 from time import sleep
+
+from py_hydropi.lib.modules.switch import Switch
 from ..logger import Logger
 from ..time_utils import parse_clock_time_string, parse_simple_time_string
 
@@ -12,44 +14,13 @@ def timer_factory(timer_type, **params):
         return SimpleTimer(**params)
 
 
-class Timer(object):
-    logger = Logger('Timer')
-
+class Timer(Switch):
     def __init__(self):
-        self.attached_outputs = []
+        super(Timer, self).__init__()
         self.attached_triggered_outputs = {}
         self.activated_time = None  # type: datetime
         self.deactivated_time = datetime.now()  # type: datetime
-        self._continue = True  # set to false to exit self._timer_loop
-        self.outputs_activated = False
         self.triggered_outputs_activated = False
-        self.timer_thread = None
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.stop()
-
-    def attach_object(self, obj):
-        self.attached_outputs.append(obj)
-
-    def _activate_objects(self):
-        if not self.outputs_activated:
-            for output in self.attached_outputs:
-                if output.manual_control:
-                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
-                else:
-                    self.logger.info('signalling output {} to activate'.format(output.channel))
-                    output.activate()
-            self.outputs_activated = True
-
-    def _deactivate_objects(self):
-        if self.outputs_activated:
-            for output in self.attached_outputs:
-                if output.manual_control:
-                    self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
-                else:
-                    self.logger.info('signalling output {} to deactivate'.format(output.channel))
-                    output.deactivate()
-            self.outputs_activated = False
 
     def _activate_triggered_objects(self, group_name):
         if not self.triggered_outputs_activated:
@@ -95,23 +66,18 @@ class Timer(object):
     def _check_after_trigger(self):
         raise NotImplementedError()
 
-    def start(self):
-        self.timer_thread = Thread(target=self._timer_loop)
-        self.timer_thread.start()
-
-    def stop(self):
-        self._deactivate_objects()
-        for group in self.attached_triggered_outputs.keys():
-            self._deactivate_triggered_objects(group)
-        self._continue = False
-
-    def _timer_loop(self):
+    def _main_loop(self):
         while self._continue:
             self._check_timer()
             self._check_after_trigger()
             self._check_before_trigger()
             sleep(0.5)
         self.stop()
+
+    def stop(self):
+        for group in self.attached_triggered_outputs.keys():
+            self._deactivate_triggered_objects(group)
+        super(Timer, self).stop()
 
     def to_json(self):
         return {

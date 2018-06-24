@@ -8,7 +8,7 @@ from cherrypy import _cpwsgi_server, _cpserver
 
 
 class ApiServer(object):
-    def __init__(self, db, service_name='cherrypy'):
+    def __init__(self, db, config, service_name='cherrypy'):
         self.logger = Logger(service_name)
         self.is_running = False
         self.strict_port_checking = False
@@ -20,6 +20,7 @@ class ApiServer(object):
     def start(self):
         if self.is_running:
             return
+        self.is_running = True
         # hackery to stop cherrypy outputting log to stdout (spams journald when ran
         # in the foreground as a systemd service. all logs from cherrypy will now be
         # routed to syslog instead (journal if running systemd)
@@ -30,15 +31,15 @@ class ApiServer(object):
         cherrypy.engine.signals.subscribe()
         cherrypy.log.access_log.log = self.logger.log
         cherrypy.log.access_log.propagate = False
-        self.is_running = True
         cherrypy.engine.start()
 
     def stop(self):
         self.logger.info('exiting')
-        self.db.server_queue.put('exit')
         if self.is_running:
             cherrypy.engine.exit()
-            self.is_running = False
+            self.exit = True
+        self.db.server_queue.put('exit')
+        self.is_running = False
 
     def load_config(self, config):
         self.strict_port_checking = config.strict_port_checking
