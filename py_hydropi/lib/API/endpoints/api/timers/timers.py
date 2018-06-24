@@ -1,4 +1,4 @@
-from py_hydropi.lib import timer_factory, Output, parse_simple_time_string, parse_clock_time_string
+from py_hydropi.lib import Output, parse_simple_time_string, parse_clock_time_string
 from py_hydropi.lib.API.api_endpoint_base import APIEndpointBase
 
 
@@ -7,41 +7,7 @@ class Timers(APIEndpointBase):
         return {k: v.to_json() for k, v in self.api.db.timers.items()}
 
     def _post(self, data):
-        def _verify_group(in_group):
-            try:
-                split_group = in_group.split('.')
-            except AttributeError:
-                return False
-            if (len(split_group) != 2) or (split_group[0] not in Output.types):
-                return False
-            else:
-                return True
-
-        missing_param_string = 'missing parameters [[group] [[on_time off_time]|active_hours]]'
-        on_time = data.get('on_time')
-        off_time = data.get('off_time')
-        active_hours = data.get('active_hours')
-        group = data.get('group')
-
-        if not _verify_group(group):
-            return 'group category must be  [{}].[groups_name]'.format(Output.types)
-
-        if not group:
-            return missing_param_string
-
-        if not (on_time and off_time) or active_hours or (
-            all([on_time, off_time, active_hours])
-        ):
-            return missing_param_string
-        else:
-            if active_hours:
-                timer = timer_factory('clock', active_hours=active_hours)
-            else:
-                timer = timer_factory('simple', off_time=off_time, on_time=on_time)
-            if group.split('.')[1] not in self.api.db.groups:
-                self.api.db.groups.append(group.split('.'))
-            self.api.db.timers[group] = timer
-        return True
+        pass
 
     def _put(self, data):
         """

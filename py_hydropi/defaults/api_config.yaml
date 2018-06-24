@@ -1,7 +1,6 @@
 # accept connections from this port only
-start: no
 strict_port_checking: no
 listen_address: 0.0.0.0
 port: 8084
 # set to true to start the API server
-start: False
+start: yes

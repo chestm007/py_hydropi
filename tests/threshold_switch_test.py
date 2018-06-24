@@ -29,13 +29,16 @@ class DO:
     manual_control = False
     channel = 1
 
-    def activate(self):
+    @staticmethod
+    def activate():
         print('activate m8')
 
-    def deactivate(self):
+    @staticmethod
+    def deactivate():
         print('deacivate m8')
 
 
+# noinspection PyTypeChecker
 def main_test(temp_moving_target=False):
     threshold_switch = ThresholdSwitch(target=20,
                                        upper=20.3,

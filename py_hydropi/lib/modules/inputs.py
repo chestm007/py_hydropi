@@ -38,7 +38,11 @@ class Input:
             with open(self._sensor_path) as s:
                 try:
                     return self._parsers[self.sensor_id](s.read())
-                except:
+
+                except KeyError:
+                    self.logger.error('parser not defined for: {}'.format(self.sensor_id))
+
+                except IndexError:
                     self.logger.error('error reading sensor data')
                     return
 

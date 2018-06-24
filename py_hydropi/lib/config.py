@@ -36,11 +36,7 @@ class ModuleConfig(BaseConfig):
 
     def _load_config(self):
         with open(self.config_dir + '/' + self.filename, 'r') as config_yaml:
-            #self.groups = yaml.load(config_yaml)
             self.config = yaml.load(config_yaml)
-            self.lights = self.config.get('lights')  # type: list
-            self.water_pumps = self.config.get('water_pumps')  # type: list
-            self.air_pumps = self.config.get('air_pumps')  # type: list
 
 
 class ApiConfig(BaseConfig):

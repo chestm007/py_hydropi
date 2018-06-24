@@ -1,5 +1,6 @@
 import time
 
+from py_hydropi.lib import Output
 from py_hydropi.lib.modules.inputs import Input
 from py_hydropi.lib.modules.switch import Switch
 from py_hydropi.lib.modules.timer import SimpleTimer
@@ -27,6 +28,22 @@ class ThresholdSwitch(Switch):
         self._rising_activated = False
         self._falling_activated = False
         self.threshold_timer = None
+
+    @classmethod
+    def load_config(cls, raspberry_pi_timer, config):
+        return {group: cls(
+            target=group_settings.get('target'),
+            upper=group_settings.get('upper').get('limit'),
+            lower=group_settings.get('lower').get('limit'),
+            min_duty_cycle=group_settings.get('min_duty_cycle'),
+            input_=Input(group_settings.get('input')).start()
+        ).set_rising_object(
+            Output(gpio=raspberry_pi_timer.gpio,
+                   channel=group_settings.get('lower').get('channel'))
+        ).set_falling_object(
+            Output(gpio=raspberry_pi_timer.gpio,
+                   channel=group_settings.get('upper').get('channel'))
+        ) for group, group_settings in config.items()}
 
     def set_rising_object(self, obj):
         self._rising_object = obj

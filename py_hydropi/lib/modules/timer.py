@@ -1,26 +1,30 @@
 from datetime import datetime, timedelta
-from threading import Thread
 from time import sleep
 
+from py_hydropi.lib import Output
 from py_hydropi.lib.modules.switch import Switch
-from ..logger import Logger
 from ..time_utils import parse_clock_time_string, parse_simple_time_string
-
-
-def timer_factory(timer_type, **params):
-    if timer_type == 'clock':
-        return ClockTimer(**params)
-    if timer_type == 'simple':
-        return SimpleTimer(**params)
 
 
 class Timer(Switch):
     def __init__(self):
-        super(Timer, self).__init__()
+        super().__init__()
         self.attached_triggered_outputs = {}
         self.activated_time = None  # type: datetime
-        self.deactivated_time = datetime.now()  # type: datetime
+        self.deactivated_time = None  # type: datetime
         self.triggered_outputs_activated = False
+
+    def _activate_objects(self, activated_time=None):
+        if not self.outputs_activated:
+            self.activated_time = activated_time or datetime.now()
+            self.deactivated_time = None
+            super()._activate_objects()
+
+    def _deactivate_objects(self, deactivaed_time=None):
+        if self.outputs_activated:
+            self.activated_time = None
+            self.deactivated_time = deactivaed_time or datetime.now()
+            super()._deactivate_objects()
 
     def _activate_triggered_objects(self, group_name):
         if not self.triggered_outputs_activated:
@@ -28,7 +32,7 @@ class Timer(Switch):
                 if output.manual_control:
                     self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
                 else:
-                    self.logger.info('signalling output {} to activate'.format(output.channel))
+                    self.logger.info('signalling triggered output {} to activate'.format(output.channel))
                     output.activate()
                 self.triggered_outputs_activated = True
 
@@ -38,19 +42,24 @@ class Timer(Switch):
                 if output.manual_control:
                     self.logger.info('output {} is manually controlled, skipping signal'.format(output.channel))
                 else:
-                    self.logger.info('signalling output {} to deactivate'.format(output.channel))
+                    self.logger.info('signalling triggered output {} to deactivate'.format(output.channel))
                     output.deactivate()
                 self.triggered_outputs_activated = False
 
     def attach_triggered_object(self, obj, group_name, before, after):
-        if group_name in self.attached_triggered_outputs.keys():
-            self.attached_triggered_outputs[group_name]['objects'].append(obj)
-        else:
+        if group_name not in self.attached_triggered_outputs.keys():
             self.attached_triggered_outputs[group_name] = {
-                'objects': [obj],
+                'objects': [],
                 'before': parse_simple_time_string(before),
                 'after': parse_simple_time_string(after)
             }
+
+        if type(obj) in (list, tuple):
+            self.attached_triggered_outputs[group_name]['objects'].extend(obj)
+        else:
+            self.attached_triggered_outputs[group_name]['objects'].append(obj)
+
+        return self
 
     def _check_timer(self):
         """
@@ -97,6 +106,10 @@ class Timer(Switch):
                                     }
         return out_dict
 
+    @classmethod
+    def load_config(cls, raspberry_pi_timer, config):
+        raise NotImplementedError
+
 
 class ClockTimer(Timer):
     def __init__(self, active_hours):
@@ -136,12 +149,31 @@ class ClockTimer(Timer):
             if off_datetime + timedelta(seconds=opts['after']) > now:
                 self._deactivate_triggered_objects(group_name)
 
+    @classmethod
+    def load_config(cls, raspberry_pi_timer, config):
+        return {group: cls(
+            active_hours=group_settings.get('active_hours')
+        ).attach_object(
+            [Output(raspberry_pi_timer.gpio, chan)
+             for chan in group_settings.get('channels')]
+        ) for group, group_settings in config.items()}
+
 
 class SimpleTimer(Timer):
     def __init__(self, on_time, off_time):
         self.on_time = parse_simple_time_string(on_time)  # type: int
         self.off_time = parse_simple_time_string(off_time)  # type: int
         super().__init__()
+
+    @classmethod
+    def load_config(cls, raspberry_pi_timer, config):
+        return {group: cls(
+            on_time=group_settings.get('on_time'),
+            off_time=group_settings.get('off_time')
+        ).attach_object(
+            [Output(raspberry_pi_timer.gpio, chan)
+             for chan in group_settings.get('channels')]
+        ) for group, group_settings in config.items()}
 
     def _check_timer(self):
         now = datetime.now()

@@ -4,11 +4,14 @@ import os
 from py_hydropi.lib.memdatabase import MemDatabase
 
 from ..logger import Logger
+
+# noinspection PyProtectedMember
 from cherrypy import _cpwsgi_server, _cpserver
 
 
 class ApiServer(object):
     def __init__(self, db, config, service_name='cherrypy'):
+        self.config = config
         self.logger = Logger(service_name)
         self.is_running = False
         self.strict_port_checking = False
@@ -16,7 +19,9 @@ class ApiServer(object):
         self.logger = Logger('api')
         self.cherrypy_server = _cpwsgi_server.CPWSGIServer()
         self.db = db  # type: MemDatabase
+        self.exit = None
 
+    # noinspection PyProtectedMember
     def start(self):
         if not self.config.start:
             return

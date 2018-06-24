@@ -1,6 +1,7 @@
 import logging
 
 
+# noinspection PyUnusedLocal
 class Logger(object):
     DEBUG = logging.DEBUG
     INFO = logging.INFO

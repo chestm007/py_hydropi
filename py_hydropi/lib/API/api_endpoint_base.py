@@ -2,6 +2,7 @@ from py_hydropi.lib.API.main import ApiServer
 import cherrypy
 
 
+# noinspection PyPep8Naming
 class APIEndpointBase(object):
     exposed = True
     error_405 = cherrypy.HTTPError(405, None)

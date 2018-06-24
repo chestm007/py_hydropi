@@ -11,8 +11,16 @@ class Switch:
         self._continue = True  # set to false to exit self._timer_loop
         self.outputs_activated = False
 
+    @classmethod
+    def load_config(cls, raspberry_pi_timer, config):
+        raise NotImplementedError
+
     def attach_object(self, obj):
-        self.attached_outputs.append(obj)
+        if type(obj) in (list, tuple):
+            self.attached_outputs.extend(obj)
+        else:
+            self.attached_outputs.append(obj)
+        return self
 
     def _activate_objects(self):
         if not self.outputs_activated:

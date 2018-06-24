@@ -28,63 +28,36 @@
 #
 
 
-#lights:
-#  group1:
-#    channels:
-#      - 1
-#      - 2
-#      - 3
-#      - 4
-#      - 5
-#    schedule:
-#      clock:
-#        active_hours: '4:00am - 10:00pm'
+clock_timer:
+  grow_lights:
+    channels:
+      - 1
+    active_hours: '4:00am - 10:00pm'
 
-water_pumps:
-  group1:
+simple_timer:
+  irrigation_pump:
     channels:
       - 10
       - 11
-    schedule:
-      simple:
-        on_time: 20s
-        off_time: 20s
-  group2:
-    channels:
-      - 14
-    schedule:
-      simple:
-        on_time: 5m
-        off_time: 15m
-
+    on_time: 20s
+    off_time: 20s
 
 threshold:
-  group1:
+  climate_control:
     upper:
-      channel: 1
+      channel: 5
       limit: 20.3
     lower:
-      channel: 2
+      channel: 6
       limit: 19.7
     target: 20
     input: 28-041752029bff
     min_duty_cycle: 0.2
 
-air_pumps:
-  group1:
-    channels:
-      - 12
-      - 13
-    schedule:
-      trigger:
-        object: water_pumps.group1
-        before: 5s
-        after: 5s
-  group2:
+triggered:
+  reservoir_air_pump:
     channels:
       - 15
-    schedule:
-      trigger:
-        object: water_pumps.group2
-        before: 5s
-        after: 5s
+    object: simple_timer.irrigation_pump
+    before: 5s
+    after: 5s

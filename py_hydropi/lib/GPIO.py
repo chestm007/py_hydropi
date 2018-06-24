@@ -3,6 +3,7 @@ import os
 from .logger import Logger
 
 if os.environ.get('PY_HYDROPI_TESTING') == 'true':
+    # noinspection PyUnusedLocal
     class RPIGPIO(object):
         class Bcm(object):
             pass
@@ -41,6 +42,7 @@ else:
     import RPi.GPIO as RPIGPIO
 
 
+# noinspection PyUnusedLocal
 class GPIO(object):
     def __init__(self):
         self._GPIO = RPIGPIO  # type: RPIGPIO

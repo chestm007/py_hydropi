@@ -1,7 +1,11 @@
 # py_hydropi
 
-This is a fairly simple python daemon for controlling hydroponics equipment via a RaspberryPI.
-All configuration is done via easy to understand YAML files, the example in `/py_hydropi/defaults/module_config.yaml`
+## this program must be ran as root, nothing malicious happens in this code,
+but i would advise reading it before runnin just for good measure
+This is a fairly simple python daemon for controlling hydroponics equipment
+via a RaspberryPI.
+All configuration is done via easy to understand YAML files, the example
+in `/py_hydropi/defaults/module_config.yaml`
 outlines all possible configuration options
 
 ## Testing
