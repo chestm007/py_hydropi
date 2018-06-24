@@ -6,12 +6,12 @@ from ..logger import Logger
 
 
 class Input:
-    _logger = Logger('Input')
-    _parsers = {'28-041752029bff': lambda i: int(i[1].split('t=')[1]) / 1000.0}
+    _parsers = {'28-041752029bff': lambda i: int(i.splitlines()[1].split('t=')[1]) / 1000.0}
     _path = '/sys/bus/w1/devices'
     _sensor_template = '{path}/{sensor_id}/w1_slave'
 
     def __init__(self, sensor_id):
+        self.logger = Logger(self.__class__.__name__)
         self.sensor_id = sensor_id
         self.temp = 0
         self._continue = False
@@ -36,7 +36,12 @@ class Input:
     def _read(self):
         try:
             with open(self._sensor_path) as s:
-                return self._parsers[self.sensor_id](s.read())
+                try:
+                    return self._parsers[self.sensor_id](s.read())
+                except:
+                    self.logger.error('error reading sensor data')
+                    return
+
         except FileNotFoundError:
-            self._logger.error('specified sensor not found: {}\nexiting monitoing thread'.format(self._sensor_path))
+            self.logger.error('specified sensor not found: {}\nexiting monitoing thread'.format(self._sensor_path))
             self.stop()

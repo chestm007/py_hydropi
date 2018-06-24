@@ -52,11 +52,13 @@ class ThresholdSwitch(Switch):
     def _deactivate_rising_objects(self):
         if self._rising_activated:
             self._rising_object.deactivate()
+            self._rising_activated = False
         self._state = self.INACTIVE
 
     def _deactivate_falling_objects(self):
         if self._falling_activated:
             self._falling_object.deactivate()
+            self._falling_activated = False
         self._state = self.INACTIVE
 
     def stop(self):
