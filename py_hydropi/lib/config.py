@@ -31,7 +31,7 @@ class BaseConfig(object):
 
 class ModuleConfig(BaseConfig):
     def __init__(self, config_dir=default_config_dir):
-        config_dir = config_dir + MODULE_CONFIG_FILENAME
+        config_dir += MODULE_CONFIG_FILENAME
         super().__init__(config_dir)
 
     def _load_config(self):
@@ -45,7 +45,7 @@ class ModuleConfig(BaseConfig):
 
 class ApiConfig(BaseConfig):
     def __init__(self, config_dir=default_config_dir):
-        config_dir = config_dir + API_CONFIG_FILENAME
+        config_dir += API_CONFIG_FILENAME
         super().__init__(config_dir)
 
     def _load_config(self):

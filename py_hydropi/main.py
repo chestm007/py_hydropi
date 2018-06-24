@@ -54,7 +54,7 @@ class RaspberryPiTimer(object):
         if hasattr(self, 'api'):
             self.api.stop()
         for timer in self.db.timers.values():
-            self.logger.info('Stopping timer for {}'.format(''.join(timer.keys())))
+            self.logger.info('Stopping timer for {}'.format(''.join(timer.to_json())))
             timer.stop()
         self.cleanup()
 

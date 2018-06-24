@@ -18,6 +18,8 @@ class ApiServer(object):
         self.db = db  # type: MemDatabase
 
     def start(self):
+        if not self.config.start:
+            return
         if self.is_running:
             return
         self.is_running = True
@@ -42,6 +44,9 @@ class ApiServer(object):
         self.is_running = False
 
     def load_config(self, config):
+        self.config = config
+        if not self.config.start:
+            return
         self.strict_port_checking = config.strict_port_checking
         self.cherrypy_server.bind_addr = (config.listen_address,
                                           config.port)
