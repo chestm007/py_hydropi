@@ -49,6 +49,14 @@ water_pumps:
       simple:
         on_time: 20s
         off_time: 20s
+  group2:
+    channels:
+      - 14
+    schedule:
+      simple:
+        on_time: 5m
+        off_time: 15m
+
 
 threshold:
   group1:
@@ -62,29 +70,21 @@ threshold:
     input: 28-041752029bff
     min_duty_cycle: 0.2
 
-#  group2:
-#    channels:
-#      - 14
-#    schedule:
-#      simple:
-#        on_time: 5m
-#        off_time: 15m
-
-#air_pumps:
-#  group1:
-#    channels:
-#      - 12
-#      - 13
-#    schedule:
-#      trigger:
-#        object: water_pumps.group1
-#        before: 5s
-#        after: 5s
-#  group2:
-#    channels:
-#      - 15
-#    schedule:
-#      trigger:
-#        object: water_pumps.group2
-#        before: 5s
-#        after: 5s
+air_pumps:
+  group1:
+    channels:
+      - 12
+      - 13
+    schedule:
+      trigger:
+        object: water_pumps.group1
+        before: 5s
+        after: 5s
+  group2:
+    channels:
+      - 15
+    schedule:
+      trigger:
+        object: water_pumps.group2
+        before: 5s
+        after: 5s
