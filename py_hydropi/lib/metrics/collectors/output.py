@@ -19,10 +19,13 @@ class OutputMetricCollector(ThreadedDaemon):
             outputs = []
 
             for group, controller in group_dict.items():
-                if hasattr(controller, 'attached_triggered_outputs'):
-                    for d in controller.attached_triggered_outputs.values():
-                        outputs.extend(d.get('objects'))
-                outputs.extend(controller.attached_outputs)
+                if hasattr(controller, '_rising_object') and hasattr(controller, '_falling_object'):
+                    outputs.extend([controller._rising_object, controller._falling_object])
+                else:
+                    if hasattr(controller, 'attached_triggered_outputs'):
+                        for d in controller.attached_triggered_outputs.values():
+                            outputs.extend(d.get('objects'))
+                    outputs.extend(controller.attached_outputs)
 
                 for output in outputs:
                     self.reporter.push(

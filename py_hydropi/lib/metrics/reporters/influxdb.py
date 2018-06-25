@@ -22,7 +22,7 @@ class InfluxDBClient:
         return str(time.time()).replace('.', '')
 
     def push(self, metric, value):
-        payload = "{metric},host={hostname} value={value} {timestamp}".format(
+        payload = "{metric},host={hostname} value={value} {timestamp}00".format(
             metric=metric,
             hostname=self.hostname,
             value=value,
