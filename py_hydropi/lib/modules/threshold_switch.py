@@ -36,7 +36,7 @@ class ThresholdSwitch(Switch):
             upper=group_settings.get('upper').get('limit'),
             lower=group_settings.get('lower').get('limit'),
             min_duty_cycle=group_settings.get('min_duty_cycle'),
-            input_=Input(group_settings.get('input')).start()
+            input_=raspberry_pi_timer.db.get_input(group_settings.get('input'))
         ).set_rising_object(
             Output(gpio=raspberry_pi_timer.gpio,
                    channel=group_settings.get('lower').get('channel'))

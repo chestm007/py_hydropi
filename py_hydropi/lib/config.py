@@ -3,8 +3,9 @@ import os
 
 
 MODULE_CONFIG_FILENAME = 'module_config.yaml'
-API_CONFIG_FILENAME = 'api_config.yaml' \
-                      ''
+API_CONFIG_FILENAME = 'api_config.yaml'
+METRICS_CONFIG_FILENAME = 'metrics.yaml'
+
 if os.environ.get('PY_HYDROPI_TESTING') == 'true':
     default_config_dir = 'py_hydropi/defaults/'
 else:
@@ -26,7 +27,12 @@ class BaseConfig(object):
             # TODO: generate default config file
 
     def _load_config(self):
-        raise NotImplementedError
+        with open(self.config_dir + '/' + self.filename, 'r') as config_yaml:
+            self.config = yaml.load(config_yaml)
+            self._config_parser()
+
+    def _config_parser(self):
+        pass
 
 
 class ModuleConfig(BaseConfig):
@@ -34,9 +40,14 @@ class ModuleConfig(BaseConfig):
         config_dir += MODULE_CONFIG_FILENAME
         super().__init__(config_dir)
 
-    def _load_config(self):
-        with open(self.config_dir + '/' + self.filename, 'r') as config_yaml:
-            self.config = yaml.load(config_yaml)
+
+class MetricsConfig(BaseConfig):
+    def __init__(self, config_dir=default_config_dir):
+        config_dir += METRICS_CONFIG_FILENAME
+        super().__init__(config_dir)
+
+    def _config_parser(self):
+        self.reporter = list(self.config.get('reporter').keys())[0]
 
 
 class ApiConfig(BaseConfig):
@@ -44,10 +55,8 @@ class ApiConfig(BaseConfig):
         config_dir += API_CONFIG_FILENAME
         super().__init__(config_dir)
 
-    def _load_config(self):
-        with open(self.config_dir + '/' + self.filename, 'r') as config_yaml:
-            config = yaml.load(config_yaml)
-            self.strict_port_checking = config.get('strict_port_checking')
-            self.listen_address = config.get('listen_address')
-            self.port = config.get('port')
-            self.start = config.get('start')
+    def _config_parser(self):
+        self.strict_port_checking = self.config.get('strict_port_checking')
+        self.listen_address = self.config.get('listen_address')
+        self.port = self.config.get('port')
+        self.start = self.config.get('start')

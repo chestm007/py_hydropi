@@ -1,8 +1,11 @@
 from multiprocessing import Queue
 
 
-from py_hydropi.lib.config import ApiConfig
+from py_hydropi.lib.config import ApiConfig, MetricsConfig
 from py_hydropi.lib.memdatabase import MemDatabase
+from py_hydropi.lib.metrics.collectors.output import OutputMetricCollector
+from py_hydropi.lib.metrics.collectors.sensor import SensorMetricCollector
+from py_hydropi.lib.metrics.reporters.influxdb import InfluxDBClient
 from py_hydropi.lib.modules.threshold_switch import ThresholdSwitch
 from py_hydropi.lib.modules.timer import SimpleTimer, ClockTimer
 
@@ -17,12 +20,18 @@ class RaspberryPiTimer(object):
         self.gpio = GPIO()
         self.module_config = ModuleConfig()
         self.api_config = ApiConfig()
+        self.metrics_config = MetricsConfig()
         self.queue = Queue()
         self.db = MemDatabase(self.queue)
         self.db.gpio = self.gpio
         if self.api_config.start:
             self.api = ApiServer(self.db, self.api_config)
         self.setup_outputs()
+        if self.metrics_config.reporter == 'influxdb':
+            self.metric_reporter = InfluxDBClient(**self.metrics_config.config.get('reporter').get('influxdb'))
+        self.metrics_collectors = [
+            collector(self.db, self.metric_reporter)
+            for collector in (SensorMetricCollector, OutputMetricCollector)]
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
@@ -37,6 +46,9 @@ class RaspberryPiTimer(object):
             for name, c in type_.items():
                 self.logger.info('Starting controller: {}'.format(name))
                 c.start()
+        for c in self.metrics_collectors:
+            c.start()
+
         self._queue_loop()
 
     def _queue_loop(self):

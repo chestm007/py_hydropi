@@ -1,14 +1,10 @@
-from threading import Thread
-
-from py_hydropi.lib.logger import Logger
+from py_hydropi.lib.threaded_daemon import ThreadedDaemon
 
 
-class Switch:
+class Switch(ThreadedDaemon):
     def __init__(self):
-        self.logger = Logger(self.__class__.__name__)
+        super().__init__()
         self.attached_outputs = []
-        self._thread = None
-        self._continue = True  # set to false to exit self._timer_loop
         self.outputs_activated = False
 
     @classmethod
@@ -42,18 +38,7 @@ class Switch:
                     output.deactivate()
             self.outputs_activated = False
 
-    def start(self):
-        self._thread = Thread(target=self._main_loop)
-        self._thread.start()
-
     def stop(self):
+        super().stop()
         self._deactivate_objects()
-        self._continue = False
-
-    def _main_loop(self):
-        raise NotImplementedError
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.stop()
-
 
