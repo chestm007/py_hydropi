@@ -4,9 +4,12 @@ import time
 
 import requests
 
+from py_hydropi.lib.logger import Logger
+
 
 class InfluxDBClient:
     def __init__(self, endpoint="127.0.0.1", port=8086, hostname=None, db='py_hydropi'):
+        self.logger = Logger(self.__class__.__name__)
         self.endpoint = endpoint
         self.port = port
         self.hostname = hostname or self._get_hostname()
@@ -31,4 +34,4 @@ class InfluxDBClient:
         res = requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
                             data=payload,
                             headers={'Content-Type': 'application/octet-stream'})
-        print(res)
+        self.logger.debug('sending metrics payload returned with {}'.format(res))

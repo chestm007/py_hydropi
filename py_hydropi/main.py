@@ -3,6 +3,7 @@ from multiprocessing import Queue
 
 from py_hydropi.lib.config import ApiConfig, MetricsConfig
 from py_hydropi.lib.memdatabase import MemDatabase
+from py_hydropi.lib.metrics.collector_controller import MetricCollectorController
 from py_hydropi.lib.metrics.collectors.output import OutputMetricCollector
 from py_hydropi.lib.metrics.collectors.sensor import SensorMetricCollector
 from py_hydropi.lib.metrics.reporters.influxdb import InfluxDBClient
@@ -29,9 +30,12 @@ class RaspberryPiTimer(object):
         self.setup_outputs()
         if self.metrics_config.reporter == 'influxdb':
             self.metric_reporter = InfluxDBClient(**self.metrics_config.config.get('reporter').get('influxdb'))
-        self.metrics_collectors = [
-            collector(self.db, self.metric_reporter)
-            for collector in (SensorMetricCollector, OutputMetricCollector)]
+
+        self.metrics_controller = MetricCollectorController(
+            self.db, self.metric_reporter, [
+                SensorMetricCollector, OutputMetricCollector
+            ]
+        )
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
@@ -46,8 +50,7 @@ class RaspberryPiTimer(object):
             for name, c in type_.items():
                 self.logger.info('Starting controller: {}'.format(name))
                 c.start()
-        for c in self.metrics_collectors:
-            c.start()
+        self.metrics_controller.start()
 
         self._queue_loop()
 
