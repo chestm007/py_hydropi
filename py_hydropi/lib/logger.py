@@ -1,4 +1,6 @@
 import logging
+
+import os
 from systemd import journal
 
 
@@ -10,10 +12,24 @@ class Logger(object):
     ERROR = logging.ERROR
 
     def __init__(self, obj, debug=False):
-        self._logger = logging.getLogger(obj)
-        if not self._logger.handlers:
-            self._logger.addHandler(journal.JournaldLogHandler())
-        self._logger.setLevel(logging.DEBUG if debug else logging.INFO)
+        if os.environ.get('PY_HYDROPI_LOGGING'):
+            env_level = os.environ.get('PY_HYDROPI_LOGGING')
+            if env_level:
+                self.level = getattr(self, env_level)
+
+            class ScreenLogger(logging.Logger):
+                warning = print
+                info = print
+                error = print
+                debug = print
+            self._logger = ScreenLogger(obj)
+        else:
+            self._logger = logging.getLogger(obj)
+            if not self._logger.handlers:
+                self._logger.addHandler(journal.JournaldLogHandler())
+        if debug:
+            self.level = self.DEBUG
+        self._logger.setLevel(self.level or self.INFO)
         self.calling_obj = obj
 
     def warn(self, msg, *args, **kwargs):

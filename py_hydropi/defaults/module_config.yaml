@@ -1,27 +1,6 @@
 #
 ### FILE SPECS
 #
-#
-# this file should be created in the following format:
-# object_type:   # lights|water_pumps|air_pumps
-#   group_name:  # any valid python variable
-#     channels:  # a list of channels belonging to this group
-#       - 1      # as integers.
-#     schedule:  # do not change this line
-#       timer:   # type of timer your using clock|simple|trigger
-#                #
-#                # clock:
-#                #   active_hours '4:00am - 10:00pm'  # set your active time like this
-#                #
-#                # simple:
-#                #   on_time: 5m  # duration to keep this output on (d,h,m,s)
-#                #   off_time: 15m  # duration to leave this output off (d,h,m,s)
-#                #
-#                # trigger:
-#                #   object: lights.group_name  # output type and group_name to depend on
-#                #   before: 5m  # turn on this amount of time before the dependancy (d,h,m,s)
-#                #   after: 5m  # turn off this amount of time after the dependancy (d,h,m,s)
-#
 ##############################################################################################
 #
 # WORKING EXAMPLE yaml
@@ -32,7 +11,7 @@ clock_timer:
   grow_lights:
     channels:
       - 1
-    active_hours: '4:00am - 10:00pm'
+    active_hours: '12:30am - 4:00am'
 
 simple_timer:
   irrigation_pump:
@@ -53,7 +32,23 @@ threshold:
     target: 20
     input: AdafruitDHT1.temperature
     min_duty_cycle: 0.2
+    alter_target:
+      input: AdafruitDHT1.humidity  # output: simple_timer.irrigation_pump
+      alter_by: -5
+      when: "> 18"  # when: activated|deactivated
 
+  reservoir_ph_adjuster:
+    upper:
+      channel: 2
+      limit: 6
+    lower:
+      channel: 3
+      limit: 5
+    target: 5.5
+    input: ReservoirPH1.ph_level
+    periodic:
+      active: 10s
+      inactive: 30m
 
 triggered:
   reservoir_air_pump:
@@ -69,5 +64,11 @@ sensors:
     provides:
       - humidity
       - temperature
+
   ambient1:
     sensor_id: 28-041752029bff
+
+  ReservoirPH1:
+    channel: 7
+    provides:
+      - ph_level

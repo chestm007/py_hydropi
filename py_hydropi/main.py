@@ -110,8 +110,7 @@ class RaspberryPiTimer(object):
                             before=group_settings.get('before'),
                             after=group_settings.get('after'))
                         continue
-                print('error binding trigger: {}'.format(group))
-
+                self.logger.error('error binding trigger: {}'.format(group))
 
 
 def main():

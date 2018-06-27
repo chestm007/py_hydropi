@@ -15,6 +15,4 @@ tests must be ran from the root repository directory
 
 ### TODO
 - inter-thread events system
-- trigger dependant thresholds (ie, when lights on, temp target is 5 lower)
-- active time thresholds (ie, every 30m if ph > 5.5, activate doser for 10s)
 - event triggered (ie, turn on fan for 5 mins 1 hour before lights activate)

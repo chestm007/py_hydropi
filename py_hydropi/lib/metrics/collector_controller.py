@@ -25,11 +25,12 @@ class MetricCollectorController(ThreadedDaemon):
         while self._continue:
             thread_pool = []
             for c in self.collectors:
-                for id, value in c.push_all():
-                    t = Thread(target=self.reporter.push, args=[self.log_result, id, value])
+                for id_, value in c.push_all():
+                    t = Thread(target=self.reporter.push, args=[self.log_result, id_, value])
                     thread_pool.append(t)
                     t.start()
-            results = [t.join() for t in thread_pool]
+            for t in thread_pool:
+                t.join()
             time.sleep(self.frequency)
 
     def log_result(self, res):
