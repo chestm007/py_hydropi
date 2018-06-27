@@ -8,8 +8,8 @@ class MemDatabase(object):
         self.server_queue = queue
         self._inputs = {}
 
-    def get_input(self, input_id):
-        if input_id not in self._inputs.keys():
-            self._inputs[input_id] = Input(input_id).start()
-        return self._inputs[input_id]
+    def get_input(self, sensor_id=None, sensor_channel=None):
+        if sensor_id not in self._inputs.keys():
+            self._inputs[sensor_id] = Input(sensor_id=sensor_id).start()
+        return self._inputs[sensor_id]
 

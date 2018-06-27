@@ -37,7 +37,7 @@ class ThresholdSwitch(Switch):
             upper=group_settings.get('upper').get('limit'),
             lower=group_settings.get('lower').get('limit'),
             min_duty_cycle=group_settings.get('min_duty_cycle'),
-            input_=raspberry_pi_timer.db.get_input(group_settings.get('input'))
+            input_=raspberry_pi_timer.db.get_input(sensor_id=group_settings.get('input'))
         ).set_rising_object(
             Output(pi_timer=raspberry_pi_timer,
                    channel=group_settings.get('lower').get('channel'))
@@ -85,6 +85,7 @@ class ThresholdSwitch(Switch):
 
     def _main_loop(self):
         while self._continue:
+            print(self._input.value_index)
             if self._state == self.FALLING:
                 if self._input.temp <= self._target:
                     self._deactivate_falling_objects()

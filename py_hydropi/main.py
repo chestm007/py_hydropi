@@ -6,7 +6,7 @@ from py_hydropi.lib.memdatabase import MemDatabase
 from py_hydropi.lib.metrics.collector_controller import MetricCollectorController
 from py_hydropi.lib.metrics.collectors.output import OutputMetricCollector
 from py_hydropi.lib.metrics.collectors.sensor import SensorMetricCollector
-from py_hydropi.lib.metrics.reporters.influxdb import InfluxDBClient
+from py_hydropi.lib.modules.inputs import Input
 from py_hydropi.lib.modules.threshold_switch import ThresholdSwitch
 from py_hydropi.lib.modules.timer import SimpleTimer, ClockTimer
 
@@ -30,7 +30,7 @@ class RaspberryPiTimer(object):
         if self.api_config.start:
             self.api = ApiServer(self.db, self.api_config)
 
-        self.setup_outputs()
+        self.setup_IO()
 
         if self.metrics_config.enabled:
             self.metrics_controller = MetricCollectorController(
@@ -78,7 +78,11 @@ class RaspberryPiTimer(object):
                 c.stop()
         self.cleanup()
 
-    def setup_outputs(self):
+    def setup_IO(self):
+        sensor_config = self.module_config.config.get('sensors')
+        if sensor_config is not None:
+            self.db._inputs = Input.load_config(sensor_config)
+
         clock_config = self.module_config.config.get('clock_timer')
         if clock_config is not None:
             self.db.controllers['clock_timer'] = ClockTimer.load_config(self, clock_config)
@@ -107,6 +111,7 @@ class RaspberryPiTimer(object):
                             after=group_settings.get('after'))
                         continue
                 print('error binding trigger: {}'.format(group))
+
 
 
 def main():

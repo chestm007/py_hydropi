@@ -51,7 +51,7 @@ threshold:
       channel: 6
       limit: 19.7
     target: 20
-    input: 28-041752029bff
+    input: AdafruitDHT1.temperature
     min_duty_cycle: 0.2
 
 
@@ -62,3 +62,10 @@ triggered:
     object: simple_timer.irrigation_pump
     before: 5s
     after: 5s
+
+sensors:
+  AdafruitDHT1:
+    channel: 4
+    provides:
+      - humidity
+      - temperature
