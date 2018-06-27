@@ -85,7 +85,6 @@ class ThresholdSwitch(Switch):
 
     def _main_loop(self):
         while self._continue:
-            print(self._input.value_index)
             if self._state == self.FALLING:
                 if self._input.temp <= self._target:
                     self._deactivate_falling_objects()

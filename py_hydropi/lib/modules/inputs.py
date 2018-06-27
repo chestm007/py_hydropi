@@ -11,7 +11,6 @@ class Input(ThreadedDaemon):
 
     def __init__(self, sensor_id=None, channel=None, value_index=None):
         super().__init__()
-        print(channel, value_index)
         assert sensor_id or (channel is not None and value_index is not None)
         assert sensor_id is None or (channel is None and value_index is None)
 
@@ -35,8 +34,11 @@ class Input(ThreadedDaemon):
     def load_config(config):
         sensors = {}
         for sensor, config in config.items():
-            for i, val in enumerate(config.get('provides')):
-                sensors['{}.{}'.format(sensor, val)] = Input(channel=config.get('channel'), value_index=i).start()
+            if config.get('channel'):
+                for i, val in enumerate(config.get('provides')):
+                    sensors['{}.{}'.format(sensor, val)] = Input(channel=config.get('channel'), value_index=i).start()
+            elif config.get('sensor_id'):
+                sensors[sensor] = Input(sensor_id=config.get('sensor_id'))
         return sensors
 
     def _main_loop(self):

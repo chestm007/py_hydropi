@@ -69,3 +69,5 @@ sensors:
     provides:
       - humidity
       - temperature
+  ambient1:
+    sensor_id: 28-041752029bff
