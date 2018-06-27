@@ -154,7 +154,7 @@ class ClockTimer(Timer):
         return {group: cls(
             active_hours=group_settings.get('active_hours')
         ).attach_object(
-            [Output(raspberry_pi_timer.gpio, chan)
+            [Output(raspberry_pi_timer, chan)
              for chan in group_settings.get('channels')]
         ) for group, group_settings in config.items()}
 
@@ -171,7 +171,7 @@ class SimpleTimer(Timer):
             on_time=group_settings.get('on_time'),
             off_time=group_settings.get('off_time')
         ).attach_object(
-            [Output(raspberry_pi_timer.gpio, chan)
+            [Output(raspberry_pi_timer, chan)
              for chan in group_settings.get('channels')]
         ) for group, group_settings in config.items()}
 

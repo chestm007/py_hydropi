@@ -5,5 +5,4 @@ class SensorMetricCollector:
         self.reporter = reporter
 
     def push_all(self):
-        for id, sensor in self.db._inputs.items():
-            self.reporter.push(id, sensor.value)
+        return [(id, sensor.value) for id, sensor in self.db._inputs.items()]

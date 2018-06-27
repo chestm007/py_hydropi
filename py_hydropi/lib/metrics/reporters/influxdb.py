@@ -24,14 +24,13 @@ class InfluxDBClient:
     def _get_current_timestamp():
         return str(time.time()).replace('.', '')
 
-    def push(self, metric, value):
+    def push(self, callback, metric, value):
         payload = "{metric},host={hostname} value={value} {timestamp}00".format(
             metric=metric,
             hostname=self.hostname,
             value=value,
             timestamp=self._get_current_timestamp()
         )
-        res = requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
-                            data=payload,
-                            headers={'Content-Type': 'application/octet-stream'})
-        self.logger.debug('sending metrics payload returned with {}'.format(res))
+        callback(requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
+                               data=payload,
+                               headers={'Content-Type': 'application/octet-stream'}))

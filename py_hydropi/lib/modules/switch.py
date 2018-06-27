@@ -5,7 +5,7 @@ class Switch(ThreadedDaemon):
     def __init__(self):
         super().__init__()
         self.attached_outputs = []
-        self.outputs_activated = False
+        self.outputs_activated = None
 
     @classmethod
     def load_config(cls, raspberry_pi_timer, config):

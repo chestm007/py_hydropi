@@ -54,6 +54,7 @@ threshold:
     input: 28-041752029bff
     min_duty_cycle: 0.2
 
+
 triggered:
   reservoir_air_pump:
     channels:

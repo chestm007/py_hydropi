@@ -44,10 +44,13 @@ class ModuleConfig(BaseConfig):
 class MetricsConfig(BaseConfig):
     def __init__(self, config_dir=default_config_dir):
         config_dir += METRICS_CONFIG_FILENAME
+        self.enabled = False
         super().__init__(config_dir)
 
     def _config_parser(self):
-        self.reporter = list(self.config.get('reporter').keys())[0]
+        if self.config.get('reporter'):
+            self.enabled = True
+            self.reporter = list(self.config.get('reporter').keys())[0]
 
 
 class ApiConfig(BaseConfig):

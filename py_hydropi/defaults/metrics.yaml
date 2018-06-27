@@ -2,5 +2,5 @@ reporter:
   influxdb:
     endpoint: 192.168.1.2
     port: 8086
-    hostname: mypipytimer
+    hostname: mypipytimer2
     db: py_hydropi

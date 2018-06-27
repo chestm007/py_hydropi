@@ -28,6 +28,7 @@ class ThresholdSwitch(Switch):
         self._rising_activated = False
         self._falling_activated = False
         self.threshold_timer = None
+        #self._modify_triggers
 
     @classmethod
     def load_config(cls, raspberry_pi_timer, config):
@@ -38,10 +39,10 @@ class ThresholdSwitch(Switch):
             min_duty_cycle=group_settings.get('min_duty_cycle'),
             input_=raspberry_pi_timer.db.get_input(group_settings.get('input'))
         ).set_rising_object(
-            Output(gpio=raspberry_pi_timer.gpio,
+            Output(pi_timer=raspberry_pi_timer,
                    channel=group_settings.get('lower').get('channel'))
         ).set_falling_object(
-            Output(gpio=raspberry_pi_timer.gpio,
+            Output(pi_timer=raspberry_pi_timer,
                    channel=group_settings.get('upper').get('channel'))
         ) for group, group_settings in config.items()}
 

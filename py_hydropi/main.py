@@ -19,23 +19,28 @@ class RaspberryPiTimer(object):
     def __init__(self):
         self.logger = Logger(self.__class__.__name__)
         self.gpio = GPIO()
-        self.module_config = ModuleConfig()
-        self.api_config = ApiConfig()
-        self.metrics_config = MetricsConfig()
         self.queue = Queue()
         self.db = MemDatabase(self.queue)
         self.db.gpio = self.gpio
+
+        self.module_config = ModuleConfig()
+        self.api_config = ApiConfig()
+        self.metrics_config = MetricsConfig()
+
         if self.api_config.start:
             self.api = ApiServer(self.db, self.api_config)
-        self.setup_outputs()
-        if self.metrics_config.reporter == 'influxdb':
-            self.metric_reporter = InfluxDBClient(**self.metrics_config.config.get('reporter').get('influxdb'))
 
-        self.metrics_controller = MetricCollectorController(
-            self.db, self.metric_reporter, [
-                SensorMetricCollector, OutputMetricCollector
-            ]
-        )
+        self.setup_outputs()
+
+        if self.metrics_config.enabled:
+            if self.metrics_config.reporter == 'influxdb':
+                self.metric_reporter = InfluxDBClient(**self.metrics_config.config.get('reporter').get('influxdb'))
+
+            self.metrics_controller = MetricCollectorController(
+                self.db, self.metric_reporter, [
+                    SensorMetricCollector, OutputMetricCollector
+                ]
+            )
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
@@ -50,7 +55,8 @@ class RaspberryPiTimer(object):
             for name, c in type_.items():
                 self.logger.info('Starting controller: {}'.format(name))
                 c.start()
-        self.metrics_controller.start()
+        if hasattr(self, 'metrics_controller'):
+            self.metrics_controller.start()
 
         self._queue_loop()
 
@@ -97,7 +103,7 @@ class RaspberryPiTimer(object):
                     parent_group = parent_controller.get(parent_group)
                     if parent_group:
                         parent_group.attach_triggered_object(
-                            obj=[Output(self.gpio, chan)
+                            obj=[Output(self, chan)
                                  for chan in group_settings.get('channels')],
                             group_name=group,
                             before=group_settings.get('before'),

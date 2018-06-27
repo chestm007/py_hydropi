@@ -5,8 +5,8 @@ class OutputMetricCollector:
         self.reporter = reporter
 
     def push_all(self):
+        outputs = []
         for type_, group_dict in self.db.controllers.items():
-            outputs = []
 
             for group, controller in group_dict.items():
                 if hasattr(controller, '_rising_object') and hasattr(controller, '_falling_object'):
@@ -17,8 +17,6 @@ class OutputMetricCollector:
                             outputs.extend(d.get('objects'))
                     outputs.extend(controller.attached_outputs)
 
-                for output in outputs:
-                    self.reporter.push(
-                        'channel{channel}activated'.format(channel=output.channel),
-                        int(output.state)
-                    )
+        return [('channel{channel}activated'.format(channel=output.channel), int(output.state))
+                for output in outputs]
+

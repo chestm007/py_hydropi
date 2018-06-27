@@ -1,4 +1,5 @@
 import time
+from threading import Thread
 
 from py_hydropi.lib.threaded_daemon import ThreadedDaemon
 
@@ -20,6 +21,14 @@ class MetricCollectorController(ThreadedDaemon):
 
     def _main_loop(self):
         while self._continue:
+            thread_pool = []
             for c in self.collectors:
-                c.push_all()
+                for id, value in c.push_all():
+                    t = Thread(target=self.reporter.push, args=[self.log_result, id, value])
+                    thread_pool.append(t)
+                    t.start()
+            results = [t.join() for t in thread_pool]
             time.sleep(self.frequency)
+
+    def log_result(self, res):
+        self.logger.debug('Metrics report returned {}'.format(res))
