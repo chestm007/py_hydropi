@@ -4,3 +4,4 @@ reporter:
     port: 8086
     hostname: mypipytimer2
     db: py_hydropi
+frequency: 5

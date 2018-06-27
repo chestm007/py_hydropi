@@ -1,15 +1,17 @@
 import time
 from threading import Thread
 
+from py_hydropi.lib.metrics.reporters import reporter_factory
 from py_hydropi.lib.threaded_daemon import ThreadedDaemon
 
 
 class MetricCollectorController(ThreadedDaemon):
-    def __init__(self, db, reporter, collectors: list):
+    def __init__(self, db, config, collectors: list):
         super().__init__()
         self.db = db
-        self.reporter = reporter
-        self.frequency = 10
+        self.config = config.config
+        self.reporter = reporter_factory(self.config.get('reporter'))
+        self.frequency = self.config.get('frequency', 10)
         self.collectors = [self._init_collector(c) for c in collectors]
 
     def add_collector(self, collector):

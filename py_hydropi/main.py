@@ -33,11 +33,8 @@ class RaspberryPiTimer(object):
         self.setup_outputs()
 
         if self.metrics_config.enabled:
-            if self.metrics_config.reporter == 'influxdb':
-                self.metric_reporter = InfluxDBClient(**self.metrics_config.config.get('reporter').get('influxdb'))
-
             self.metrics_controller = MetricCollectorController(
-                self.db, self.metric_reporter, [
+                self.db, self.metrics_config, [
                     SensorMetricCollector, OutputMetricCollector
                 ]
             )
