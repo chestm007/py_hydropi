@@ -72,3 +72,9 @@ sensors:
     channel: 7
     provides:
       - ph_level
+
+  BloomTank1:
+    channels:
+      out: 20  # TRIG
+      in: 21  # ECHO
+    samples: 5

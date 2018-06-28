@@ -81,7 +81,7 @@ class RaspberryPiTimer(object):
     def setup_IO(self):
         sensor_config = self.module_config.config.get('sensors')
         if sensor_config is not None:
-            self.db._inputs = Input.load_config(sensor_config)
+            self.db._inputs = Input.load_config(self, sensor_config)
 
         clock_config = self.module_config.config.get('clock_timer')
         if clock_config is not None:

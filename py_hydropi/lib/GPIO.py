@@ -53,7 +53,7 @@ class GPIO(object):
         self._GPIO.cleanup()
 
     def setup_input_channel(self, channel: int, pull_up_down=None):
-        self._GPIO.setup(int(channel), self._GPIO.IN, pull_up_down=pull_up_down or self._GPIO.PUD_DOWN)
+        self._GPIO.setup(int(channel), self._GPIO.IN)
 
     def setup_output_channel(self, channel: int, initial_state=False):
         try:
