@@ -33,14 +33,27 @@ class Input(ThreadedDaemon):
         self.channels = channels
         self.channel = channel
         self.value_index = value_index
-        if not hasattr(self, 'value'):
-            self.value = 0
+        self._last_value = 0
+        if not hasattr(self, '_value'):
+            self._value = 0
         self._sensor_path = self._sensor_template.format(path=self._path,
                                                          sensor_id=self.sensor_id)
 
     @property
     def temp(self):
         return self.value
+
+    @property
+    def value(self):
+        if self._value == 0:
+            if self._last_value == 0:
+                return self._value
+            else:
+                v = self._last_value
+                self._last_value = 0
+                return v
+        else:
+            return self._value
 
     @staticmethod
     def load_config(pi_timer, config):
@@ -57,7 +70,7 @@ class Input(ThreadedDaemon):
 
     def _main_loop(self):
         while self._continue:
-            self.value = avg([self._read() or 0 for i in range(self._samples)])
+            self._value = avg([self._read() or 0 for i in range(self._samples)])
             time.sleep(1)
 
     def _read_channels(self):
