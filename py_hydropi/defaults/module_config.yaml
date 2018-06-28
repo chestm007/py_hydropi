@@ -60,21 +60,21 @@ triggered:
 
 sensors:
   AdafruitDHT1:
-    channel: 4
+    channel: 4  # tested with adafruit DHT11 temp/humi sensor
     provides:
       - humidity
       - temperature
 
   ambient1:
-    sensor_id: 28-041752029bff
+    sensor_id: 28-041752029bff  # tested with duinotech temp sensor
 
-  ReservoirPH1:
+  ReservoirPH1:  # completely untested
     channel: 7
     provides:
       - ph_level
 
   BloomTank1:
-    channels:
+    channels:  # tested with duinotech ultrasonic sensor
       out: 20  # TRIG
       in: 21  # ECHO
     samples: 5

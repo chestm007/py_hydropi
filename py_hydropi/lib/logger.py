@@ -12,8 +12,10 @@ class Logger(object):
     ERROR = logging.ERROR
 
     def __init__(self, obj, debug=False):
-        if os.environ.get('PY_HYDROPI_LOGGING'):
+        self.level = self.INFO
+        if os.environ.get('PY_HYDROPI_TESTING'):
             env_level = os.environ.get('PY_HYDROPI_LOGGING')
+            print()
             if env_level:
                 self.level = getattr(self, env_level)
 

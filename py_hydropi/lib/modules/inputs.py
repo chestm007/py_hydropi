@@ -7,6 +7,7 @@ from py_hydropi.lib.threaded_daemon import ThreadedDaemon
 
 
 class Input(ThreadedDaemon):
+    # TODO: this may benefit from inheritance and a factory method, possibly force stating input type in config.
     _parsers = {'28-041752029bff': lambda i: int(i.splitlines()[1].split('t=')[1]) / 1000.0}
     _path = '/sys/bus/w1/devices'
     _sensor_template = '{path}/{sensor_id}/w1_slave'
@@ -60,6 +61,10 @@ class Input(ThreadedDaemon):
             time.sleep(1)
 
     def _read_channels(self):
+        self.gpio._GPIO.output(self.channels.get('out'), True)
+        time.sleep(0.00001)
+        self.gpio._GPIO.output(self.channels.get('out'), False)
+
         pulse_end, pulse_start = [None]*2
 
         while self.gpio._GPIO.input(self.channels.get('in')) == 0:
