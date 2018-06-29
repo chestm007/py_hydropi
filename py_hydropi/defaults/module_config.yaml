@@ -33,9 +33,11 @@ threshold:
     input: AdafruitDHT1.temperature
     min_duty_cycle: 0.2
     alter_target:
-      input: AdafruitDHT1.humidity  # output: simple_timer.irrigation_pump
+      #input: AdafruitDHT1.humidity
+      output: simple_timer.irrigation_pump
       alter_by: -5
-      when: "> 18"  # when: activated|deactivated
+      #when: "> 18"
+      when: activated
 
   reservoir_ph_adjuster:
     upper:

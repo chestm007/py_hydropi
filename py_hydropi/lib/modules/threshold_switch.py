@@ -12,15 +12,14 @@ class ThresholdSwitch(Switch):
     INACTIVE = 0
 
     def __init__(self, target: float=None, upper: float=None,
-                 lower: float=None, min_duty_cycle: float=0, input_: Input=None, poll_sec=1,
-                 periodic=None, alter_target=None, rpi_timer=None):
+                 lower: float=None, input_: Input=None, poll_sec=1,
+                 alter_target=None, rpi_timer=None):
 
-        super(ThresholdSwitch, self).__init__()
-        self.rpi_timer=rpi_timer
+        super().__init__()
+        self.rpi_timer = rpi_timer
         self._target = target
         self._upper = upper
         self._lower = lower
-        self._min_duty_cycle = min_duty_cycle
         self._input = input_
         self._state = self.INACTIVE
         self._rising_object = None
@@ -28,13 +27,6 @@ class ThresholdSwitch(Switch):
         self._rising_activated = False
         self._falling_activated = False
         self._poll_sec = poll_sec
-        self._periodic = periodic
-        if self._periodic:
-            self._periodic_active_sec = parse_simple_time_string(periodic.get('active'))
-            self._poll_sec = parse_simple_time_string(periodic.get('inactive'))
-            self._sub_loop = self._periodic_main_loop
-        else:
-            self._sub_loop = self._normal_main_loop
 
         if alter_target:
             altering_output = alter_target.get('output')
@@ -61,9 +53,22 @@ class ThresholdSwitch(Switch):
 
         self.threshold_timer = None
 
+    @staticmethod
+    def factory(**kwargs):
+        if kwargs.get('periodic'):
+            kwargs = {k: v for k, v in kwargs.items() if k in ('target', 'upper', 'lower', 'input_',
+                                                               'poll_sec', 'periodic', 'rpi_timer',
+                                                               'alter_target')}
+            return PeriodicThresholdSwitch(**kwargs)
+        elif kwargs.get('min_duty_cycle'):
+            kwargs = {k: v for k, v in kwargs.items() if k in ('target', 'upper', 'lower', 'input_',
+                                                               'poll_sec', 'min_duty_cycle',
+                                                               'rpi_timer', 'alter_target')}
+            return TargetThresholdSwitch(**kwargs)
+
     @classmethod
     def load_config(cls, raspberry_pi_timer, config):
-        objects = {group: cls(
+        objects = {group: cls.factory(
             target=group_settings.get('target'),
             upper=group_settings.get('upper').get('limit'),
             lower=group_settings.get('lower').get('limit'),
@@ -130,14 +135,26 @@ class ThresholdSwitch(Switch):
                     self._lower += self.alter_by
                     self._target += self.alter_by
                     self.logger.debug('post-alter >{} <{} ={}'.format(self._upper, self._lower, self._target))
-            self._sub_loop()
-            if hasattr(self, 'alter_by'):
+                self._sub_loop()
                 self._upper, self._lower, self._target = upper, lower, target
                 self.logger.debug('post-loop >{} <{} ={}'.format(self._upper, self._lower, self._target))
+            else:
+                self._sub_loop()
 
             time.sleep(self._poll_sec)
 
-    def _periodic_main_loop(self):
+
+class PeriodicThresholdSwitch(ThresholdSwitch):
+    def __init__(self, target=None, upper: float=None, lower: float=None, input_: Input=None,
+                 poll_sec=1, periodic=None, rpi_timer=None, alter_target=None):
+
+        super().__init__(target=target, upper=upper, lower=lower, input_=input_,
+                         poll_sec=poll_sec, alter_target=alter_target, rpi_timer=rpi_timer)
+        self._periodic = periodic
+        self._periodic_active_sec = parse_simple_time_string(periodic.get('active'))
+        self._poll_sec = parse_simple_time_string(periodic.get('inactive'))
+
+    def _sub_loop(self):
         if self._input.value < self._lower:
             self._activate_rising_objects()
             time.sleep(self._periodic_active_sec)
@@ -148,7 +165,18 @@ class ThresholdSwitch(Switch):
             time.sleep(self._periodic_active_sec)
             self._deactivate_falling_objects()
 
-    def _normal_main_loop(self):
+
+class TargetThresholdSwitch(ThresholdSwitch):
+    def __init__(self, target: float=None, upper: float=None,
+                 lower: float=None, min_duty_cycle: float=0, input_: Input=None, poll_sec=1,
+                 alter_target=None, rpi_timer=None):
+
+        super().__init__(target=target, upper=upper, lower=lower, input_=input_,
+                         poll_sec=poll_sec, alter_target=alter_target, rpi_timer=rpi_timer)
+        self.rpi_timer = rpi_timer
+        self._min_duty_cycle = min_duty_cycle
+
+    def _sub_loop(self):
         if self._state == self.FALLING:
             if self._input.temp <= self._target:
                 self._deactivate_falling_objects()
