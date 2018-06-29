@@ -85,11 +85,11 @@ class Input(ThreadedDaemon):
 
         while self.gpio._GPIO.input(self.channels.get('in')) == 1:
             pulse_end = time.time()
+        if pulse_start is not None and pulse_end is not None:
+            pulse_duration = pulse_end - pulse_start
+            distance = pulse_duration * 17150
 
-        pulse_duration = pulse_end - pulse_start
-        distance = pulse_duration * 17150
-
-        return round(distance, 2)
+            return round(distance, 2)
 
     def _read_channel(self):
         val = None
