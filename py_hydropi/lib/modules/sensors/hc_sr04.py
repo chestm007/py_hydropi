@@ -22,6 +22,13 @@ class UltrasonicInput(Input):
         else:
             self.correction = None
 
+    @property
+    def speed_of_sound(self):
+        if self.correction:
+            return self.SPEED_OF_SOUND + (0.6 * (self.correction.value - 20))
+        else:
+            return self.SPEED_OF_SOUND
+
     def _read(self):
         self.gpio._GPIO.output(self.channels.get('out'), True)
         time.sleep(0.00001)
@@ -36,8 +43,6 @@ class UltrasonicInput(Input):
             pulse_end = time.time()
         if pulse_start is not None and pulse_end is not None:
             pulse_duration = pulse_end - pulse_start
-            distance = pulse_duration * (self.SPEED_OF_SOUND * self.FACTOR)
-            if self.correction:
-                distance = distance + ((self.correction.value - 20) *0.6)
+            distance = pulse_duration * (self.speed_of_sound * self.FACTOR)
 
             return round(distance, 2)
