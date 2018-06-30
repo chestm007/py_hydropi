@@ -24,9 +24,9 @@ class Input(ThreadedDaemon):
                 self.rp_max = range_percentage.get('max')
                 self.rp_inverted = range_percentage.get('inverted')
                 if self.rp_inverted:
-                    self.value_processor = lambda v: 100 - ((v - self.rp_min) / self.rp_max) * 100
+                    self.value_processor = lambda v: 100 - ((v - self.rp_min) / (self.rp_max - self.rp_min)) * 100
                 else:
-                    self.value_processor = lambda v: ((v - self.rp_min) / self.rp_max) * 100
+                    self.value_processor = lambda v: ((v - self.rp_min) / (self.rp_max - self.rp_min)) * 100
         else:
             self.value_processor = lambda v: v
 
