@@ -85,3 +85,9 @@ sensors:
       in: 21  # ECHO
     samples: 5
     correction: ambient1
+    value_processor:
+      range_percentage:
+        min: 20
+        max: 100
+        inverted: true
+

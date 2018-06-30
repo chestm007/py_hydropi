@@ -9,13 +9,26 @@ class Input(ThreadedDaemon):
     # TODO: this may benefit from inheritance and a factory method, possibly force stating input type in config.
     frequency = 1
 
-    def __init__(self, samples=1):
+    def __init__(self, samples=1, value_processor=None):
         super().__init__()
 
         self._samples = samples
         self._last_value = 0
         if not hasattr(self, '_value'):
             self._value = 0
+
+        if value_processor is not None:
+            if value_processor.get('range_percentage'):
+                range_percentage = value_processor.get('range_percentage')
+                self.rp_min = range_percentage.get('min')
+                self.rp_max = range_percentage.get('max')
+                self.rp_inverted = range_percentage.get('inverted')
+                if self.rp_inverted:
+                    self.value_processor = lambda v: 100 - ((v - self.rp_min) / self.rp_max) * 100
+                else:
+                    self.value_processor = lambda v: ((v - self.rp_min) / self.rp_max) * 100
+        else:
+            self.value_processor = lambda v: v
 
     @property
     def temp(self):
@@ -43,12 +56,12 @@ class Input(ThreadedDaemon):
             elif config.get('type', '').upper() in OneWireInput.provides:
                 sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id')).start()
             elif config.get('type', '').replace('-', '_').upper() in UltrasonicInput.provides:
-                sensors[sensor] = UltrasonicInput(channels=config.get('channels'), pi_timer=pi_timer).start()
+                sensors[sensor] = UltrasonicInput(channels=config.get('channels'), pi_timer=pi_timer, value_processor=config.get('value_processor')).start()
         return sensors
 
     def _main_loop(self):
         while self._continue:
-            self._value = avg([self._read() or 0 for i in range(self._samples)])
+            self._value = avg([self.value_processor(self._read()) or 0 for i in range(self._samples)])
             time.sleep(self.frequency)
 
     def _read(self):
