@@ -34,7 +34,7 @@ class ThresholdSwitch(Switch):
             self.alter_when = alter_target.get('when')
             if altering_output:
                 self.altering_obj = self.rpi_timer.db.get_output(altering_output)
-                self.alter_func = lambda o: o.outputs_activated == (self.alter_when == 'activated')
+                self.alter_func = lambda o: (o.outputs_activated or False) == (self.alter_when == 'activated')
 
             elif altering_input:
                 self.altering_obj = self.rpi_timer.db.get_input(sensor_id=altering_input)

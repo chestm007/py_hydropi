@@ -39,18 +39,18 @@ threshold:
       #when: "> 18"
       when: activated
 
-  reservoir_ph_adjuster:
-    upper:
-      channel: 2
-      limit: 6
-    lower:
-      channel: 3
-      limit: 5
-    target: 5.5
-    input: ReservoirPH1.ph_level
-    periodic:
-      active: 10s
-      inactive: 30m
+#  reservoir_ph_adjuster:
+#    upper:
+#      channel: 2
+#      limit: 6
+#    lower:
+#      channel: 3
+#      limit: 5
+#    target: 5.5
+#    input: ReservoirPH1.ph_level
+#    periodic:
+#      active: 10s
+#      inactive: 30m
 
 triggered:
   reservoir_air_pump:
@@ -62,21 +62,26 @@ triggered:
 
 sensors:
   AdafruitDHT1:
+    type: DHT11
     channel: 4  # tested with adafruit DHT11 temp/humi sensor
     provides:
       - humidity
       - temperature
 
   ambient1:
+    type: DS18B20
     sensor_id: 28-041752029bff  # tested with duinotech temp sensor
 
   ReservoirPH1:  # completely untested
+    type: foo
     channel: 7
     provides:
       - ph_level
 
   BloomTank1:
+    type: HC-SR04
     channels:  # tested with duinotech ultrasonic sensor
       out: 20  # TRIG
       in: 21  # ECHO
     samples: 5
+    correction: ambient1
