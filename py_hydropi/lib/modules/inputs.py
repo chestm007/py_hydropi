@@ -61,7 +61,7 @@ class Input(ThreadedDaemon):
 
     def _main_loop(self):
         while self._continue:
-            self._value = avg([self.value_processor(self._read()) or 0 for i in range(self._samples)])
+            self._value = avg([self.value_processor(self._read() or 0) for i in range(self._samples)])
             time.sleep(self.frequency)
 
     def _read(self):
