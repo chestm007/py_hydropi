@@ -24,7 +24,7 @@ class UltrasonicInput(Input):
 
     @property
     def speed_of_sound(self):
-        if self.correction:
+        if self.correction and self.correction.value is not None:
             return self.SPEED_OF_SOUND + (0.6 * (self.correction.value - 20))
         else:
             return self.SPEED_OF_SOUND

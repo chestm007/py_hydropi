@@ -125,23 +125,30 @@ class ThresholdSwitch(Switch):
         super().stop()
 
     def _main_loop(self):
-        upper, lower, target = [None]*3
         while self._continue:
-            if hasattr(self, 'alter_by'):
-                self.logger.debug('pre-alter >{} <{} ={}'.format(self._upper, self._lower, self._target))
-                upper, lower, target = self._upper, self._lower, self._target
-                if self.alter_func(self.altering_obj):
-                    self._upper += self.alter_by
-                    self._lower += self.alter_by
-                    self._target += self.alter_by
-                    self.logger.debug('post-alter >{} <{} ={}'.format(self._upper, self._lower, self._target))
-                self._sub_loop()
-                self._upper, self._lower, self._target = upper, lower, target
-                self.logger.debug('post-loop >{} <{} ={}'.format(self._upper, self._lower, self._target))
-            else:
-                self._sub_loop()
+            if self._input.value:
+                if hasattr(self, 'alter_by'):
+                    self.logger.debug('pre-alter >{} <{} ={}'.format(self._upper, self._lower, self._target))
+                    upper, lower, target = self._upper, self._lower, self._target
+                    try:
+                        if self.alter_func(self.altering_obj):
+                            self._upper += self.alter_by
+                            self._lower += self.alter_by
+                            self._target += self.alter_by
+                            self.logger.debug('post-alter >{} <{} ={}'.format(self._upper, self._lower, self._target))
+                    except TypeError:
+                        pass
+
+                    self._sub_loop()
+                    self._upper, self._lower, self._target = upper, lower, target
+                    self.logger.debug('post-loop >{} <{} ={}'.format(self._upper, self._lower, self._target))
+                else:
+                    self._sub_loop()
 
             time.sleep(self._poll_sec)
+
+    def _sub_loop(self):
+        raise NotImplementedError
 
 
 class PeriodicThresholdSwitch(ThresholdSwitch):
@@ -178,7 +185,7 @@ class TargetThresholdSwitch(ThresholdSwitch):
 
     def _sub_loop(self):
         if self._state == self.FALLING:
-            if self._input.temp <= self._target:
+            if self._input.value <= self._target:
                 self._deactivate_falling_objects()
         else:
             if self._min_duty_cycle and not self.threshold_timer:
@@ -189,16 +196,16 @@ class TargetThresholdSwitch(ThresholdSwitch):
                 self.threshold_timer.start()
 
             if self._state == self.INACTIVE:
-                if self._input.temp > self._upper:
+                if self._input.value > self._upper:
                     if self._min_duty_cycle and self.threshold_timer:
                         self.threshold_timer.stop()
                         self.threshold_timer = None
 
                     self._activate_falling_objects()
 
-                elif self._input.temp < self._lower:
+                elif self._input.value < self._lower:
                     self._activate_rising_objects()
 
             elif self._state == self.RISING:
-                if self._input.temp >= self._target:
+                if self._input.value >= self._target:
                     self._deactivate_rising_objects()

@@ -15,7 +15,7 @@ class Input(ThreadedDaemon):
         self._samples = samples
         self._last_value = 0
         if not hasattr(self, '_value'):
-            self._value = 0
+            self._value = None
 
         if value_processor is not None:
             if value_processor.get('range_percentage'):
@@ -31,20 +31,8 @@ class Input(ThreadedDaemon):
             self.value_processor = lambda v: v
 
     @property
-    def temp(self):
-        return self.value
-
-    @property
     def value(self):
-        if self._value == 0:
-            if self._last_value == 0:
-                return self._value
-            else:
-                v = self._last_value
-                self._last_value = 0
-                return v
-        else:
-            return self._value
+        return self._value
 
     @staticmethod
     def load_config(pi_timer, config):
@@ -61,7 +49,13 @@ class Input(ThreadedDaemon):
 
     def _main_loop(self):
         while self._continue:
-            self._value = avg([self.value_processor(self._read() or 0) for i in range(self._samples)])
+            vals = []
+            for i in range(self._samples):
+                v = self._read()
+                if v:
+                    vals.append(self.value_processor(v))
+            if vals:
+                self._value = avg(vals)
             time.sleep(self.frequency)
 
     def _read(self):
@@ -74,24 +68,7 @@ if os.environ.get('PY_HYDROPI_TESTING') == 'true':
         _temp = 20
         _test_moving_temp = True
 
-        @property
-        def temp(self):
-            if self._test_moving_temp:
-                print(self.__class__.__name__, self._temp)
-                if self.falling:
-                    if self._temp < 15:
-                        self.falling = False
-                    self._temp -= 0.1
-                    return self._temp
-                if not self.falling:
-                    if self._temp > 25:
-                        self.falling = True
-                    self._temp += 0.1
-                    return self._temp
-            else:
-                return 20
-        @property
-        def value(self):
+        def _read(self):
             if self._test_moving_temp:
                 print(self.__class__.__name__, self._temp)
                 if self.falling:
@@ -107,9 +84,6 @@ if os.environ.get('PY_HYDROPI_TESTING') == 'true':
             else:
                 return 20
 
-        def _main_loop(self):
-            time.sleep(10)
-            return
 
         def start(self):
             return self
