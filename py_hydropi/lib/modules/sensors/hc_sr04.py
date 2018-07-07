@@ -4,7 +4,7 @@ from py_hydropi.lib.modules.inputs import Input
 
 
 class UltrasonicInput(Input):
-    provides = ('HC_SR04')
+    provides = ('HC_SR04', )
     SPEED_OF_SOUND = 343
     FACTOR = 50
 

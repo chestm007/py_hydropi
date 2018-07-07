@@ -1,4 +1,12 @@
-import Adafruit_DHT
+import os
+
+if os.environ.get('PY_HYDROPI_TESTING') == 'true':
+    class Adafruit_DHT:
+        @staticmethod
+        def read_retry(_, channel):
+            return 10, 10
+else:
+    import Adafruit_DHT
 
 from py_hydropi.lib.modules.inputs import Input
 

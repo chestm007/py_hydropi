@@ -1,3 +1,5 @@
+import signal
+
 from multiprocessing import Queue
 
 
@@ -38,6 +40,7 @@ class RaspberryPiTimer(object):
                     SensorMetricCollector, OutputMetricCollector
                 ]
             )
+        signal.signal(signal.SIGINT, self.stop)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
@@ -69,13 +72,24 @@ class RaspberryPiTimer(object):
                 self.stop()
                 break
 
-    def stop(self):
+    def stop(self, *args):
         if hasattr(self, 'api'):
+            self.logger.info('Shutting down API server')
             self.api.stop()
+
         for type_ in self.db.controllers.values():
             for name, c in type_.items():
                 self.logger.info('Stopping controller: {}'.format(name))
                 c.stop()
+
+        if hasattr(self, 'metrics_controller'):
+            self.logger.info('Shutting down metrics collector.')
+            self.metrics_controller.stop()
+
+        self.logger.info('Terminating input reader loops.')
+        for sensor in self.db._inputs.values():
+            sensor.stop()
+
         self.cleanup()
 
     def setup_IO(self):
@@ -116,8 +130,6 @@ class RaspberryPiTimer(object):
 def main():
     rpi_timer = RaspberryPiTimer()
     rpi_timer.start()
-    rpi_timer.stop()
-    rpi_timer.cleanup()
 
 
 if __name__ == '__main__':

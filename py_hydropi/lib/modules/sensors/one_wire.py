@@ -2,7 +2,7 @@ from py_hydropi.lib.modules.inputs import Input
 
 
 class OneWireInput(Input):
-    provides = ('DS18B20')
+    provides = ('DS18B20', )
     _parsers = {'28-041752029bff': lambda i: int(i.splitlines()[1].split('t=')[1]) / 1000.0}
     _path = '/sys/bus/w1/devices'
     _sensor_template = '{path}/{sensor_id}/w1_slave'

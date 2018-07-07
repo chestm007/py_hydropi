@@ -3,9 +3,12 @@ from distutils.core import setup
 from setuptools import find_packages
 
 required_packages = [
-    'RPi.GPIO',
-    'PyYAML',
-    'cherrypy'
+    'RPi.GPIO==0.6.3',
+    'PyYAML==3.12',
+    'cherrypy==13.1.0',
+    'Adafruit_Python_DHT==1.3.2',
+    'systemd',
+    'requests'
 ]
 
 setup(
