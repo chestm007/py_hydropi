@@ -13,6 +13,7 @@ from py_hydropi.lib.modules.inputs import Input
 
 class DHTxxInput(Input):
     provides = ('DHT11', 'DHT22')
+    sensor_type = None
 
     def __init__(self, channel=None, value_index=None, **kwargs):
         super().__init__(**kwargs)
@@ -24,7 +25,7 @@ class DHTxxInput(Input):
     def _read(self):
         val = None
         try:
-            val = Adafruit_DHT.read_retry(11, self.channel)
+            val = Adafruit_DHT.read_retry(self.sensor_type, self.channel)
             val = val[self.value_index]
         except IndexError:
             self.logger.error('error processing response from sensor channel {}({})'.format(
@@ -33,3 +34,13 @@ class DHTxxInput(Input):
             self.logger.error('error reading from {}: channel {}({})'.format(
                 self.__class__.__name__, self.channel, self.value_index))
         return val
+
+
+class DHT11Input(DHTxxInput):
+    provides = ('DHT11', )
+    sensor_type = 11
+
+
+class DHT22Input(DHTxxInput):
+    provides = ('DHT22', )
+    sensor_type = 11

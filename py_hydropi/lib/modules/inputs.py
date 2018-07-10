@@ -37,9 +37,12 @@ class Input(ThreadedDaemon):
     def load_config(pi_timer, config):
         sensors = {}
         for sensor, config in config.items():
-            if config.get('type', '').upper() in DHTxxInput.provides:
+            if config.get('type', '').upper() in DHT11Input.provides:
                 for i, val in enumerate(config.get('provides')):
-                    sensors['{}.{}'.format(sensor, val)] = DHTxxInput(channel=config.get('channel'), value_index=i).start()
+                    sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'), value_index=i).start()
+            elif config.get('type', '').upper() in DHT22Input.provides:
+                for i, val in enumerate(config.get('provides')):
+                    sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'), value_index=i).start()
 
             elif config.get('type', '').upper() in OneWireInput.provides:
                 sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id')).start()
@@ -86,6 +89,6 @@ if os.environ.get('PY_HYDROPI_TESTING') == 'true':
                 return 20
 
 
-from py_hydropi.lib.modules.sensors.dhtxx import DHTxxInput
+from py_hydropi.lib.modules.sensors.dhtxx import DHTxxInput, DHT11Input, DHT22Input
 from py_hydropi.lib.modules.sensors.one_wire import OneWireInput
 from py_hydropi.lib.modules.sensors.hc_sr04 import UltrasonicInput

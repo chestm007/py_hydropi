@@ -68,6 +68,12 @@ sensors:
       - humidity
       - temperature
 
+  AdafruitDHT2:
+    type: DHT22
+    channel: 4  # tested with adafruit DHT11 temp/humi sensor
+    provides:
+      - humidity
+      - temperature
   ambient1:
     type: DS18B20
     sensor_id: 28-041752029bff  # tested with duinotech temp sensor
