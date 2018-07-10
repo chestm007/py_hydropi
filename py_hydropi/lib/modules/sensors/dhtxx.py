@@ -43,4 +43,4 @@ class DHT11Input(DHTxxInput):
 
 class DHT22Input(DHTxxInput):
     provides = ('DHT22', )
-    sensor_type = 11
+    sensor_type = 22
