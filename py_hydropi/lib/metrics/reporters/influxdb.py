@@ -23,12 +23,15 @@ class InfluxDBClient:
         return str(time.time()).replace('.', '')
 
     def push(self, callback, metric, value):
-        payload = "{metric},host={hostname} value={value} {timestamp}00".format(
-            metric=metric,
-            hostname=self.hostname,
-            value=value,
-            timestamp=self._get_current_timestamp()
-        )
-        callback(requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
-                               data=payload,
-                               headers={'Content-Type': 'application/octet-stream'}))
+        self.logger.debug('metric: {}, value: {}'.format(metric, value))
+        if value is not None:
+            payload = "{metric},host={hostname} value={value} {timestamp}00".format(
+                metric=metric,
+                hostname=self.hostname,
+                value=value,
+                timestamp=self._get_current_timestamp()
+            )
+            callback(requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
+                                   data=payload,
+                                   headers={'Content-Type': 'application/octet-stream'}))
+

@@ -34,4 +34,4 @@ class MetricCollectorController(ThreadedDaemon):
             time.sleep(self.frequency)
 
     def log_result(self, res):
-        self.logger.debug('Metrics report returned {}'.format(res))
+        self.logger.debug('Metrics report returned {}'.format(res.__dict__))

@@ -51,8 +51,8 @@ class Input(ThreadedDaemon):
                 sensors[sensor] = UltrasonicInput(channels=config.get('channels'), pi_timer=pi_timer, value_processor=config.get('value_processor')).start()
 
             elif config.get('type', '').replace('-', '_').upper() in HomeLabPH.provides:
-                sensors['{}.pH'.format(sensor)] = HomeLabPH(value_index='pH')
-                sensors['{}.temperature'.format(sensor)] = HomeLabPH(value_index='t')
+                sensors['{}.pH'.format(sensor)] = HomeLabPH(value_index='pH').start()
+                sensors['{}.temperature'.format(sensor)] = HomeLabPH(value_index='t').start()
         return sensors
 
     def _main_loop(self):
