@@ -38,8 +38,10 @@ class DHTxxInput(Input):
 class DHT11Input(DHTxxInput):
     provides = ('DHT11', )
     sensor_type = 11
+    frequency = 3
 
 
 class DHT22Input(DHTxxInput):
     provides = ('DHT22', )
     sensor_type = 22
+    frequency = 5

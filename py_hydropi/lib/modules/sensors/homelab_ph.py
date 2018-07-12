@@ -6,6 +6,7 @@ from py_hydropi.lib.modules.inputs import Input
 
 class HomeLabPH(Input):
     provides = ('HOMELAB_PH', 'HOMELABPH')
+    frequency = 5
 
     def __init__(self, value_index=None):
         super().__init__()

@@ -57,6 +57,7 @@ class Input(ThreadedDaemon):
 
     def _main_loop(self):
         while self._continue:
+            time.sleep(self.frequency)
             vals = []
             for i in range(self._samples):
                 v = self._read()
@@ -64,7 +65,6 @@ class Input(ThreadedDaemon):
                     vals.append(self.value_processor(v))
             if vals:
                 self._value = avg(vals)
-            time.sleep(self.frequency)
 
     def _read(self):
         raise NotImplementedError
