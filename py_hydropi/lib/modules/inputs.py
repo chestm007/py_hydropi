@@ -2,6 +2,7 @@ import time
 import os
 
 from py_hydropi.lib.iter_utils import avg
+from py_hydropi.lib.modules.sensors.homelab_ph import HomeLabPH
 from py_hydropi.lib.threaded_daemon import ThreadedDaemon
 
 
@@ -49,6 +50,9 @@ class Input(ThreadedDaemon):
 
             elif config.get('type', '').replace('-', '_').upper() in UltrasonicInput.provides:
                 sensors[sensor] = UltrasonicInput(channels=config.get('channels'), pi_timer=pi_timer, value_processor=config.get('value_processor')).start()
+
+            elif config.get('type', '').replace('-', '_').upper() in HomeLabPH.provides:
+                sensors[sensor] = HomeLabPH()
         return sensors
 
     def _main_loop(self):

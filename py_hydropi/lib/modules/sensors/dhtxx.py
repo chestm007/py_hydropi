@@ -12,7 +12,6 @@ from py_hydropi.lib.modules.inputs import Input
 
 
 class DHTxxInput(Input):
-    provides = ('DHT11', 'DHT22')
     sensor_type = None
 
     def __init__(self, channel=None, value_index=None, **kwargs):
