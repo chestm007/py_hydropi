@@ -6,7 +6,7 @@ from py_hydropi.lib.threaded_daemon import ThreadedDaemon
 
 
 class Input(ThreadedDaemon):
-    frequency = 1
+    frequency = 60
 
     def __init__(self, samples=1, value_processor=None):
         super().__init__()
@@ -35,22 +35,31 @@ class Input(ThreadedDaemon):
 
     @staticmethod
     def load_config(pi_timer, config):
+        def sanitize_type(config):
+            return config.get('type', '').replace('-', '_').upper()
+
         sensors = {}
         for sensor, config in config.items():
-            if config.get('type', '').upper() in DHT11Input.provides:
-                for i, val in enumerate(config.get('provides')):
-                    sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'), value_index=i)
-            elif config.get('type', '').upper() in DHT22Input.provides:
-                for i, val in enumerate(config.get('provides')):
-                    sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'), value_index=i)
+            type_ = sanitize_type(config)
 
-            elif config.get('type', '').upper() in OneWireInput.provides:
+            if type_ in DHT11Input.provides:
+                for i, val in enumerate(config.get('provides')):
+                    sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'),
+                                                                      value_index=i)
+            elif type_ in DHT22Input.provides:
+                for i, val in enumerate(config.get('provides')):
+                    sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'),
+                                                                      value_index=i)
+
+            elif type_ in OneWireInput.provides:
                 sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id'))
 
-            elif config.get('type', '').replace('-', '_').upper() in UltrasonicInput.provides:
-                sensors[sensor] = UltrasonicInput(channels=config.get('channels'), pi_timer=pi_timer, value_processor=config.get('value_processor'))
+            elif type_ in UltrasonicInput.provides:
+                sensors[sensor] = UltrasonicInput(channels=config.get('channels'),
+                                                  pi_timer=pi_timer,
+                                                  value_processor=config.get('value_processor'))
 
-            elif config.get('type', '').replace('-', '_').upper() in HomeLabPH.provides:
+            elif type_ in HomeLabPH.provides:
                 sensors['{}.pH'.format(sensor)] = HomeLabPH(value_index='pH')
                 sensors['{}.temperature'.format(sensor)] = HomeLabPH(value_index='t')
         return sensors

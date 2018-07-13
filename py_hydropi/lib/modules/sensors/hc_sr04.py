@@ -7,7 +7,7 @@ class UltrasonicInput(Input):
     provides = ('HC_SR04', 'HCSR04')
     SPEED_OF_SOUND = 343
     FACTOR = 50
-    frequency = 10
+    frequency = 30
 
     def __init__(self, channels=None, pi_timer=None, correction=None, **kwargs):
         super().__init__(**kwargs)
