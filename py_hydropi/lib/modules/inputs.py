@@ -39,20 +39,20 @@ class Input(ThreadedDaemon):
         for sensor, config in config.items():
             if config.get('type', '').upper() in DHT11Input.provides:
                 for i, val in enumerate(config.get('provides')):
-                    sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'), value_index=i).start()
+                    sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'), value_index=i)
             elif config.get('type', '').upper() in DHT22Input.provides:
                 for i, val in enumerate(config.get('provides')):
-                    sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'), value_index=i).start()
+                    sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'), value_index=i)
 
             elif config.get('type', '').upper() in OneWireInput.provides:
-                sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id')).start()
+                sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id'))
 
             elif config.get('type', '').replace('-', '_').upper() in UltrasonicInput.provides:
-                sensors[sensor] = UltrasonicInput(channels=config.get('channels'), pi_timer=pi_timer, value_processor=config.get('value_processor')).start()
+                sensors[sensor] = UltrasonicInput(channels=config.get('channels'), pi_timer=pi_timer, value_processor=config.get('value_processor'))
 
             elif config.get('type', '').replace('-', '_').upper() in HomeLabPH.provides:
-                sensors['{}.pH'.format(sensor)] = HomeLabPH(value_index='pH').start()
-                sensors['{}.temperature'.format(sensor)] = HomeLabPH(value_index='t').start()
+                sensors['{}.pH'.format(sensor)] = HomeLabPH(value_index='pH')
+                sensors['{}.temperature'.format(sensor)] = HomeLabPH(value_index='t')
         return sensors
 
     def _main_loop(self):

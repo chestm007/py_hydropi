@@ -2,6 +2,7 @@ import signal
 
 from multiprocessing import Queue
 
+import time
 
 from py_hydropi.lib.config import ApiConfig, MetricsConfig
 from py_hydropi.lib.memdatabase import MemDatabase
@@ -49,13 +50,18 @@ class RaspberryPiTimer(object):
         self.gpio.cleanup()
 
     def start(self):
+        self.logger.info('starting all services')
         if hasattr(self, 'api'):
+            self.logger.info('starting API...')
             self.api.start()
+
+        self.logger.info('starting controllers...')
         for type_ in self.db.controllers.values():
             for name, c in type_.items():
                 self.logger.info('Starting controller: {}'.format(name))
                 c.start()
         if hasattr(self, 'metrics_controller'):
+            self.logger.info('starting metrics reporting...')
             self.metrics_controller.start()
 
         self._queue_loop()
@@ -73,6 +79,7 @@ class RaspberryPiTimer(object):
                 break
 
     def stop(self, *args):
+        self.logger.info('stopping all services')
         if hasattr(self, 'api'):
             self.logger.info('Shutting down API server')
             self.api.stop()
@@ -93,10 +100,16 @@ class RaspberryPiTimer(object):
         self.cleanup()
 
     def setup_IO(self):
+        self.logger.info('loading sensors...')
         sensor_config = self.module_config.config.get('sensors')
         if sensor_config is not None:
             self.db._inputs = Input.load_config(self, sensor_config)
+            self.logger.info('waiting 10 seconds for sensors to stabilize...')
+            time.sleep(10)
+            for sensor in self.db._inputs.values():
+                sensor.start()
 
+        self.logger.info('loading timers...')
         clock_config = self.module_config.config.get('clock_timer')
         if clock_config is not None:
             self.db.controllers['clock_timer'] = ClockTimer.load_config(self, clock_config)
@@ -105,6 +118,7 @@ class RaspberryPiTimer(object):
         if simple_config is not None:
             self.db.controllers['simple_timer'] = SimpleTimer.load_config(self, simple_config)
 
+        self.logger.info('loading switches...')
         threshold_config = self.module_config.config.get('threshold')
         if threshold_config is not None:
             self.db.controllers['threshold'] = ThresholdSwitch.load_config(self, threshold_config)
