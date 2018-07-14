@@ -32,6 +32,8 @@ class DHTxxInput(Input):
         except Exception:
             self.logger.error('error reading from {}: channel {}({})'.format(
                 self.__class__.__name__, self.channel, self.value_index))
+        if val is None:
+            self.logger.info('{} returned none'.format(self.__class__.__name__))
         return val
 
 
