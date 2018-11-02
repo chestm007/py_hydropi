@@ -6,7 +6,7 @@ class OneWireInput(Input):
     _parsers = {'28-041752029bff': lambda i: int(i.splitlines()[1].split('t=')[1]) / 1000.0}
     _path = '/sys/bus/w1/devices'
     _sensor_template = '{path}/{sensor_id}/w1_slave'
-    frequency = 30
+    frequency = 10
 
     def __init__(self, sensor_id=None, **kwargs):
         super().__init__(**kwargs)
