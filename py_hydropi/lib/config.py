@@ -6,7 +6,7 @@ MODULE_CONFIG_FILENAME = 'module_config.yaml'
 API_CONFIG_FILENAME = 'api_config.yaml'
 METRICS_CONFIG_FILENAME = 'metrics.yaml'
 
-if os.environ.get('PY_HYDROPI_TESTING') == 'true':
+if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     default_config_dir = 'py_hydropi/defaults/'
 else:
     default_config_dir = '/etc/py_hydropi/'

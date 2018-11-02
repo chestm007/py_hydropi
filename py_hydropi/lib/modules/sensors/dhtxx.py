@@ -1,6 +1,6 @@
 import os
 
-if os.environ.get('PY_HYDROPI_TESTING') == 'true':
+if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     class Adafruit_DHT:
         @staticmethod
         def read_retry(_, channel):
@@ -33,7 +33,8 @@ class DHTxxInput(Input):
             self.logger.error('error reading from {}: channel {}({})'.format(
                 self.__class__.__name__, self.channel, self.value_index))
         if val is None:
-            self.logger.info('{} returned none'.format(self.__class__.__name__))
+            self.logger.error('{}: {}({}) returned None'.format(
+                self.__class__.__name__, self.channel, self.value_index))
         return val
 
 

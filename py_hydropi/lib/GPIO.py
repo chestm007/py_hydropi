@@ -2,7 +2,7 @@ import os
 
 from .logger import Logger
 
-if os.environ.get('PY_HYDROPI_TESTING') == 'true':
+if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     # noinspection PyUnusedLocal
     class RPIGPIO(object):
         class Bcm(object):
@@ -13,9 +13,18 @@ if os.environ.get('PY_HYDROPI_TESTING') == 'true':
 
         class Out(object):
             pass
+
+        class High(object):
+            pass
+
+        class Low(object):
+            pass
+
         BCM = Bcm()
         IN = In()
         OUT = Out()
+        HIGH = High()
+        LOW = Low()
 
         @staticmethod
         def setmode(mode):
@@ -28,7 +37,7 @@ if os.environ.get('PY_HYDROPI_TESTING') == 'true':
         @staticmethod
         def setup(channel, input_output, pull_up_down=None, initial=None):
             assert type(channel) == int
-            assert (isinstance(input_output, RPIGPIO.In) or isinstance(input_output, RPIGPIO.Out))
+            assert isinstance(input_output, (RPIGPIO.In, RPIGPIO.Out, RPIGPIO.High, RPIGPIO.Low))
 
         @staticmethod
         def output(channel, state):
@@ -57,15 +66,15 @@ class GPIO(object):
 
     def setup_output_channel(self, channel: int, initial_state=False):
         try:
-            self._GPIO.setup(int(channel), self._GPIO.IN)
+            self._GPIO.setup(int(channel), self._GPIO.OUT)
         except ValueError:
             self.logger.error('error processing channel {}'.format(channel))
 
     def set_output_on(self, channel):
-        self._GPIO.setup(channel, self._GPIO.OUT)
+        self._GPIO.setup(channel, self._GPIO.HIGH)
 
     def set_output_off(self, channel):
-        self._GPIO.setup(channel, self._GPIO.IN)
+        self._GPIO.setup(channel, self._GPIO.LOW)
 
     def get_input(self, channel):
         return self._GPIO.input(channel)

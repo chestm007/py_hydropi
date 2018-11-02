@@ -14,6 +14,7 @@ class UltrasonicInput(Input):
         assert channels and pi_timer
 
         self.gpio = pi_timer.gpio
+        self.gpio.setup_output_channel(channels.get('out'), True)
         self.gpio.set_output_on(channels.get('out'))
         self.gpio.setup_input_channel(channels.get('in'))
         self.gpio._GPIO.output(channels.get('out'), False)
