@@ -67,6 +67,7 @@ class GPIO(object):
     def setup_output_channel(self, channel: int, initial_state=False):
         try:
             self._GPIO.setup(int(channel), self._GPIO.OUT)
+            self.logger.debug('set channel {} as output'.format(channel))
         except ValueError:
             self.logger.error('error processing channel {}'.format(channel))
 

@@ -17,7 +17,6 @@ class UltrasonicInput(Input):
         self.gpio.setup_output_channel(channels.get('out'), True)
         self.gpio.set_output_on(channels.get('out'))
         self.gpio.setup_input_channel(channels.get('in'))
-        self.gpio._GPIO.output(channels.get('out'), False)
         self.channels = channels
         if correction is not None:
             self.correction = pi_timer.db.get_input(correction)
