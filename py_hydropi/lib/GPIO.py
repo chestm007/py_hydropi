@@ -72,10 +72,16 @@ class GPIO(object):
             self.logger.error('error processing channel {}'.format(channel))
 
     def set_output_on(self, channel):
-        self._GPIO.setup(channel, self._GPIO.HIGH)
+        try:
+            self._GPIO.output(channel, self._GPIO.HIGH)
+        except RuntimeError:
+            self.logger.error('error setting channel {} on'.format(channel))
 
     def set_output_off(self, channel):
-        self._GPIO.setup(channel, self._GPIO.LOW)
+        try:
+            self._GPIO.output(channel, self._GPIO.LOW)
+        except RuntimeError:
+            self.logger.error('error setting channel {} off'.format(channel))
 
     def get_input(self, channel):
         return self._GPIO.input(channel)

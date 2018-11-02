@@ -31,16 +31,16 @@ class UltrasonicInput(Input):
             return self.SPEED_OF_SOUND
 
     def _read(self):
-        self.gpio._GPIO.output(self.channels.get('out'), True)
+        self.gpio.set_output_on(self.channels.get('out'))
         time.sleep(0.00001)
-        self.gpio._GPIO.output(self.channels.get('out'), False)
+        self.gpio.set_output_off(self.channels.get('out'))
 
         pulse_end, pulse_start = [None]*2
 
-        while self.gpio._GPIO.input(self.channels.get('in')) == 0:
+        while self.gpio.get_input(self.channels.get('in')) == 0:
             pulse_start = time.time()
 
-        while self.gpio._GPIO.input(self.channels.get('in')) == 1:
+        while self.gpio.get_input(self.channels.get('in')) == 1:
             pulse_end = time.time()
         if pulse_start is not None and pulse_end is not None:
             pulse_duration = pulse_end - pulse_start
