@@ -42,7 +42,7 @@ if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
         @staticmethod
         def output(channel, state):
             assert type(channel) == int
-            assert type(state) == bool
+            assert isinstance(state, (RPIGPIO.High, RPIGPIO.Low))
 
         @staticmethod
         def input(channel):

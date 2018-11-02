@@ -5,6 +5,8 @@ import requests
 from py_hydropi.lib.logger import Logger
 
 
+SUCCESS = 204
+
 class InfluxDBClient:
     def __init__(self, endpoint="127.0.0.1", port=8086, hostname=None, db='py_hydropi'):
         self.logger = Logger(self.__class__.__name__)
@@ -31,7 +33,9 @@ class InfluxDBClient:
                 value=value,
                 timestamp=self._get_current_timestamp()
             )
-            callback(requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
+            result = requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
                                    data=payload,
-                                   headers={'Content-Type': 'application/octet-stream'}))
+                                   headers={'Content-Type': 'application/octet-stream'})
+            if result.status_code != SUCCESS:
+                callback([result.status_code, result.reason])
 
