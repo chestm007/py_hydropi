@@ -1,4 +1,5 @@
 import os
+import time
 
 if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     class Adafruit_DHT:
@@ -14,10 +15,16 @@ from py_hydropi.lib.modules.inputs import Input
 class DHTxxInput(Input):
     sensor_type = None
 
-    def __init__(self, channel=None, value_index=None, **kwargs):
+    def __init__(self, channel=None, value_index=None, power_channel=None, pi_timer=None, **kwargs):
         super().__init__(**kwargs)
-        assert channel and value_index is not None
+        if power_channel is not None and value_index == 0:
+            assert pi_timer is not None
+            self.gpio = pi_timer.gpio
+            self.power_channel = int(power_channel)
+            self.gpio.setup_output_channel(self.power_channel)
+            self.gpio.set_output_on(self.power_channel)
 
+        assert channel and value_index is not None
         self.channel = channel
         self.value_index = value_index
 
@@ -35,7 +42,14 @@ class DHTxxInput(Input):
         if val is None:
             self.logger.error('{}: {}({}) returned None'.format(
                 self.__class__.__name__, self.channel, self.value_index))
+        self.power_cycle()
         return val
+
+    def power_cycle(self):
+        if hasattr(self, 'power_channel'):
+            self.gpio.set_output_off(self.power_channel)
+            time.sleep(1)
+            self.gpio.set_output_on(self.power_channel)
 
 
 class DHT11Input(DHTxxInput):

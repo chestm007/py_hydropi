@@ -31,6 +31,7 @@ class UltrasonicInput(Input):
             return self.SPEED_OF_SOUND
 
     def _read(self):
+        read_start = time.time()
         self.gpio.set_output_on(self.channels.get('out'))
         time.sleep(0.00001)
         self.gpio.set_output_off(self.channels.get('out'))
@@ -39,9 +40,16 @@ class UltrasonicInput(Input):
 
         while self.gpio.get_input(self.channels.get('in')) == 0:
             pulse_start = time.time()
+            if pulse_start - read_start > 1000:
+                self.logger.error('Sensor timed out waiting for pulse start channels {}'.format(self.channels))
+                return None
 
         while self.gpio.get_input(self.channels.get('in')) == 1:
             pulse_end = time.time()
+            if pulse_end - read_start > 1000:
+                self.logger.error('Sensor timed out waiting for pulse end channels {}'.format(self.channels))
+                return None
+
         if pulse_start is not None and pulse_end is not None:
             pulse_duration = pulse_end - pulse_start
             distance = pulse_duration * (self.speed_of_sound * self.FACTOR)

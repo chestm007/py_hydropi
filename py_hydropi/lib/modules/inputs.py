@@ -43,19 +43,17 @@ class Input(ThreadedDaemon):
             type_ = sanitize_type(config)
 
             if type_ in DHT11Input.provides:
-                if 'power_channel' in config.keys():
-                    pi_timer.gpio.setup_output_channel(int(config.get('power_channel')))
-                    pi_timer.gpio.set_output_on(int(config.get('power_channel')))
                 for i, val in enumerate(config.get('provides')):
                     sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'),
-                                                                      value_index=i)
+                                                                      value_index=i,
+                                                                      power_channel=config.get('power_channel'),
+                                                                      pi_timer=pi_timer)
             elif type_ in DHT22Input.provides:
-                if 'power_channel' in config.keys():
-                    pi_timer.gpio.setup_output_channel(int(config.get('power_channel')))
-                    pi_timer.gpio.set_output_on(int(config.get('power_channel')))
                 for i, val in enumerate(config.get('provides')):
                     sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'),
-                                                                      value_index=i)
+                                                                      value_index=i,
+                                                                      power_channel=config.get('power_channel'),
+                                                                      pi_timer=pi_timer)
 
             elif type_ in OneWireInput.provides:
                 sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id'))
