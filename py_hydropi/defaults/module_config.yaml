@@ -63,17 +63,19 @@ triggered:
 sensors:
   AdafruitDHT1:
     type: DHT11
-    channel: 4  # tested with adafruit DHT11 temp/humi sensor
+    channel: 3  # tested with adafruit DHT11 temp/humi sensor
     provides:
       - humidity
       - temperature
 
   AdafruitDHT2:
     type: DHT22
-    channel: 4  # tested with adafruit DHT11 temp/humi sensor
+    channel: 4  # tested with adafruit DHT22 temp/humi sensor
     provides:
       - humidity
       - temperature
+    power_channel: 27
+
   ambient1:
     type: DS18B20
     sensor_id: 28-041752029bff  # tested with duinotech temp sensor

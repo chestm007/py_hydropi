@@ -43,10 +43,16 @@ class Input(ThreadedDaemon):
             type_ = sanitize_type(config)
 
             if type_ in DHT11Input.provides:
+                if 'power_channel' in config.keys():
+                    pi_timer.gpio.setup_output_channel(int(config.get('power_channel')))
+                    pi_timer.gpio.set_output_on(int(config.get('power_channel')))
                 for i, val in enumerate(config.get('provides')):
                     sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'),
                                                                       value_index=i)
             elif type_ in DHT22Input.provides:
+                if 'power_channel' in config.keys():
+                    pi_timer.gpio.setup_output_channel(int(config.get('power_channel')))
+                    pi_timer.gpio.set_output_on(int(config.get('power_channel')))
                 for i, val in enumerate(config.get('provides')):
                     sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'),
                                                                       value_index=i)
@@ -79,7 +85,7 @@ class Input(ThreadedDaemon):
         raise NotImplementedError
 
 
-if os.environ.get('PY_HYDROPI_TESTING') == 'true':
+if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     class Input(Input):
         falling = True
         _value = 20
