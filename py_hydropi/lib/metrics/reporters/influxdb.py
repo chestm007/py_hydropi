@@ -7,6 +7,7 @@ from py_hydropi.lib.logger import Logger
 
 SUCCESS = 204
 
+
 class InfluxDBClient:
     def __init__(self, endpoint="127.0.0.1", port=8086, hostname=None, db='py_hydropi'):
         self.logger = Logger(self.__class__.__name__)

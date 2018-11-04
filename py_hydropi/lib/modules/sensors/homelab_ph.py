@@ -6,6 +6,7 @@ from py_hydropi.lib.modules.inputs import Input
 
 class HomeLabPH(Input):
     provides = ('HOMELAB_PH', 'HOMELABPH')
+    get_ph_command = '/var/www/homelab/cgi-bin/get_pH.sh -j'
     frequency = 30
 
     def __init__(self, value_index=None):
@@ -14,7 +15,7 @@ class HomeLabPH(Input):
 
     def _read(self):
         try:
-            e = subprocess.check_output('/var/www/homelab/cgi-bin/get_pH.sh -j', shell=True)
+            e = subprocess.check_output(self.get_ph_command, shell=True)
             data = json.loads(e.decode('utf-8'))
             self._value = data.get(self.value_index)
 
