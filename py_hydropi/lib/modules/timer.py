@@ -3,7 +3,7 @@ from time import sleep
 
 from py_hydropi.lib import Output
 from py_hydropi.lib.modules.switch import Switch
-from ..time_utils import parse_clock_time_string, parse_simple_time_string
+from ..time_utils import parse_clock_time_string, parse_simple_time_string, time_to_datetime
 
 
 class Timer(Switch):
@@ -116,16 +116,18 @@ class ClockTimer(Timer):
         self.on_time, self.off_time = parse_clock_time_string(active_hours)
         super().__init__()
 
+    @staticmethod
+    def _get_current_time():
+        return datetime.now()
+
     def _check_timer(self):
-        now = datetime.now()
+        now = self._get_current_time()
         if self.outputs_activated:
-            off_string = now.strftime('%b %d %Y {}'.format(self.off_time))
-            off_datetime = datetime.strptime(off_string, '%b %d %Y %I:%M%p')
+            off_datetime = time_to_datetime(now, self.off_time)
             if now > off_datetime and (self.activated_time is None or off_datetime > self.activated_time):
                 self._deactivate_objects(off_datetime)
         else:
-            on_string = now.strftime('%b %d %Y {}'.format(self.on_time))
-            on_datetime = datetime.strptime(on_string, '%b %d %Y %I:%M%p')
+            on_datetime = time_to_datetime(now, self.on_time)
             if now > on_datetime and (self.deactivated_time is None or on_datetime > self.deactivated_time):
                 self._activate_objects(on_datetime)
 

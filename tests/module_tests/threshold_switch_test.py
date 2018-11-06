@@ -3,35 +3,15 @@ import time
 from py_hydropi.lib.modules.threshold_switch import TargetThresholdSwitch
 
 
-class DI:
-    def __init__(self):
-        self.falling = True
-        self.value = 0
-
-
-class DO:
-
-    def __init__(self, channel):
-        self.channel = channel
-        self.active = False
-        self.manual_control = False
-
-    def activate(self):
-        self.active = True
-        print('activate {}'.format(self.channel))
-
-    def deactivate(self):
-        self.active = False
-        print('deacivate {}'.format(self.channel))
-
-
 # noinspection PyTypeChecker
+from module_tests.base_test_object import BaseTestObject
 
-class TestThresholdSwitch:
+
+class TestThresholdSwitch(BaseTestObject):
     def setup(self):
-        self.input_ = DI()
-        self.falling = DO(1)
-        self.rising = DO(2)
+        self.input_ = self.MockInput()
+        self.falling = self.MockOutput(1)
+        self.rising = self.MockOutput(2)
         self.threshold_switch = TargetThresholdSwitch(
             target=20,
             upper=21,

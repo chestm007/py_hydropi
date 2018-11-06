@@ -35,25 +35,24 @@ class Input(ThreadedDaemon):
 
     @staticmethod
     def load_config(pi_timer, config):
-        def sanitize_type(config):
-            return config.get('type', '').replace('-', '_').upper()
 
         sensors = {}
         for sensor, config in config.items():
-            type_ = sanitize_type(config)
+            def create_dhtxx_sensor(variant):
+                return variant(channel=config.get('channel'),
+                               value_index=i,
+                               power_channel=config.get('power_channel'),
+                               pi_timer=pi_timer)
 
-            if type_ in DHT11Input.provides:
+            type_ = config.get('type', '').replace('-', '_').upper()
+
+            if type_ in DHT11Input.provides or type_ in DHT22Input.provides:
+                if type_ in DHT11Input.provides:
+                    dht_variant = DHT11Input
+                else:
+                    dht_variant = DHT22Input
                 for i, val in enumerate(config.get('provides')):
-                    sensors['{}.{}'.format(sensor, val)] = DHT11Input(channel=config.get('channel'),
-                                                                      value_index=i,
-                                                                      power_channel=config.get('power_channel'),
-                                                                      pi_timer=pi_timer)
-            elif type_ in DHT22Input.provides:
-                for i, val in enumerate(config.get('provides')):
-                    sensors['{}.{}'.format(sensor, val)] = DHT22Input(channel=config.get('channel'),
-                                                                      value_index=i,
-                                                                      power_channel=config.get('power_channel'),
-                                                                      pi_timer=pi_timer)
+                    sensors['{}.{}'.format(sensor, val)] = create_dhtxx_sensor(dht_variant)
 
             elif type_ in OneWireInput.provides:
                 sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id'))

@@ -1,27 +1,12 @@
 import time
 
 from py_hydropi.lib.modules.timer import SimpleTimer
+from module_tests.base_test_object import BaseTestObject
 
 
-class DO:
-
-    def __init__(self, channel):
-        self.channel = channel
-        self.active = False
-        self.manual_control = False
-
-    def activate(self):
-        self.active = True
-        print('activate {}'.format(self.channel))
-
-    def deactivate(self):
-        self.active = False
-        print('deacivate {}'.format(self.channel))
-
-
-class TestSimpleTimer:
+class TestSimpleTimer(BaseTestObject):
     def setup(self):
-        self.output = DO(1)
+        self.output = self.MockOutput(1)
         self.simpletimer = SimpleTimer(on_time='1s', off_time='1s')
         self.simpletimer.attach_object(self.output)
         self.simpletimer.start()

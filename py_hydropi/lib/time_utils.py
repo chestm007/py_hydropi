@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 SECONDS = 's'
 MINUTES = 'm'
@@ -28,3 +29,8 @@ def parse_simple_time_string(string):
         if found.group(DAYS):
             total_secs += int(found.group(DAYS)) * 24 * 60 * 60
     return total_secs
+
+
+def time_to_datetime(now, time):
+    time_string = now.strftime('%b %d %Y {}'.format(time))
+    return datetime.strptime(time_string, '%b %d %Y %I:%M%p')

@@ -21,5 +21,8 @@ class ThreadedDaemon:
     def _main_loop(self):
         raise NotImplementedError
 
+    def __enter__(self):
+        self.start()
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
