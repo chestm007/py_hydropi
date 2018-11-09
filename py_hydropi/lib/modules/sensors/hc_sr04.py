@@ -12,8 +12,8 @@ class UltrasonicInput(Input):
         assert channels and pi_timer
 
         self.pi_timer = pi_timer
-        self.echo = channels.get('out')
-        self.trigger = channels.get('in')
+        self.echo = channels.get('echo')
+        self.trigger = channels.get('trigger')
         self.channels = channels
         self._correction_identifier = correction
         if correction is not None:

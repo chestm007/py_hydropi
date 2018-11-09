@@ -16,7 +16,6 @@ class Input(ThreadedDaemon):
         if not hasattr(self, '_value'):
             self._value = None
 
-        print(value_processor)
         if value_processor is not None:
             if value_processor.get('range_percentage'):
                 range_percentage = value_processor.get('range_percentage')

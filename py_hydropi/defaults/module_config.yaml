@@ -89,8 +89,8 @@ sensors:
   BloomTank1:
     type: HC-SR04
     channels:  # tested with duinotech ultrasonic sensor
-      out: 20  # TRIG
-      in: 21  # ECHO
+      echo: 20
+      trigger: 21
     samples: 5
     correction: ambient1
     value_processor:

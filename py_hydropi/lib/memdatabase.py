@@ -9,8 +9,6 @@ class MemDatabase(object):
         self._inputs = {}
 
     def get_input(self, sensor_id=None):
-        if sensor_id not in self._inputs.keys():
-            print(sensor_id)
         return self._inputs.get(sensor_id)
 
     def get_output(self, output_id):
