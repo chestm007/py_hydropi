@@ -11,22 +11,36 @@ class UltrasonicInput(Input):
         super().__init__(**kwargs)
         assert channels and pi_timer
 
-        self.gpio = pi_timer.gpio
+        self.pi_timer = pi_timer
         self.echo = channels.get('out')
         self.trigger = channels.get('in')
         self.channels = channels
+        self._correction_identifier = correction
         if correction is not None:
-            self.correction = pi_timer.db.get_input(correction)  # type: Input
+            self.correction = self._get_correction_input()  # type: Input
         else:
             self.correction = None  # type: Input
 
+    def _get_correction_input(self):
+        return self.pi_timer.db.get_input(self._correction_identifier)  # type: Input
+
     def _read(self):
-        value = sensor.Measurement(self.trigger,
-                                   self.echo,
-                                   temperature=self.correction.value)
+        if self.correction is None:
+            correction = self._get_correction_input()
+            if isinstance(correction, Input):
+                self.correction = correction
+
         try:
+            value = sensor.Measurement(
+                self.trigger,
+                self.echo,
+                temperature=(
+                    self.correction.value
+                    if self.correction is not None
+                    and self.correction.value is not None
+                    else 20))
             distance = value.raw_distance(sample_size=11, sample_wait=0.2)
             return round(distance, 2)
-        except SystemError:
-            self.logger.error('echo pulse not recieved {}'.format(self.channels))
+        except Exception as e:
+            self.logger.error('{} channels:{}'.format(e, self.channels))
 

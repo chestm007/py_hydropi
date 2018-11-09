@@ -8,7 +8,7 @@ from py_hydropi.lib.threaded_daemon import ThreadedDaemon
 class Input(ThreadedDaemon):
     frequency = 60
 
-    def __init__(self, samples=1, value_processor=None):
+    def __init__(self, samples=1, value_processor=None, **kwargs):
         super().__init__()
 
         self._samples = samples
@@ -16,6 +16,7 @@ class Input(ThreadedDaemon):
         if not hasattr(self, '_value'):
             self._value = None
 
+        print(value_processor)
         if value_processor is not None:
             if value_processor.get('range_percentage'):
                 range_percentage = value_processor.get('range_percentage')
@@ -55,12 +56,10 @@ class Input(ThreadedDaemon):
                     sensors['{}.{}'.format(sensor, val)] = create_dhtxx_sensor(dht_variant)
 
             elif type_ in OneWireInput.provides:
-                sensors[sensor] = OneWireInput(sensor_id=config.get('sensor_id'))
+                sensors[sensor] = OneWireInput(**config)
 
             elif type_ in UltrasonicInput.provides:
-                sensors[sensor] = UltrasonicInput(channels=config.get('channels'),
-                                                  pi_timer=pi_timer,
-                                                  value_processor=config.get('value_processor'))
+                sensors[sensor] = UltrasonicInput(pi_timer=pi_timer, **config)
 
             elif type_ in HomeLabPH.provides:
                 sensors['{}.pH'.format(sensor)] = HomeLabPH(value_index='pH')
