@@ -8,7 +8,7 @@ required_packages = [
     'cherrypy==13.1.0',
     'Adafruit_Python_DHT==1.3.2',
     'systemd',
-    'requests'
+    'requests', 'hcsr04sensor'
 ]
 
 setup(

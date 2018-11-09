@@ -1,12 +1,10 @@
-import time
+from hcsr04sensor import sensor
 
 from py_hydropi.lib.modules.inputs import Input
 
 
 class UltrasonicInput(Input):
     provides = ('HC_SR04', 'HCSR04')
-    SPEED_OF_SOUND = 343
-    FACTOR = 50
     frequency = 30
 
     def __init__(self, channels=None, pi_timer=None, correction=None, **kwargs):
@@ -14,44 +12,21 @@ class UltrasonicInput(Input):
         assert channels and pi_timer
 
         self.gpio = pi_timer.gpio
-        self.gpio.setup_output_channel(channels.get('out'), True)
-        self.gpio.set_output_on(channels.get('out'))
-        self.gpio.setup_input_channel(channels.get('in'))
+        self.echo = channels.get('out')
+        self.trigger = channels.get('in')
         self.channels = channels
         if correction is not None:
-            self.correction = pi_timer.db.get_input(correction)
+            self.correction = pi_timer.db.get_input(correction)  # type: Input
         else:
-            self.correction = None
-
-    @property
-    def speed_of_sound(self):
-        if self.correction and self.correction.value is not None:
-            return self.SPEED_OF_SOUND + (0.6 * (self.correction.value - 20))
-        else:
-            return self.SPEED_OF_SOUND
+            self.correction = None  # type: Input
 
     def _read(self):
-        read_start = time.time()
-        self.gpio.set_output_on(self.channels.get('out'))
-        time.sleep(0.00001)
-        self.gpio.set_output_off(self.channels.get('out'))
-
-        pulse_end, pulse_start = [None]*2
-
-        while self.gpio.get_input(self.channels.get('in')) == 0:
-            pulse_start = time.time()
-            if pulse_start - read_start > 1000:
-                self.logger.error('Sensor timed out waiting for pulse start channels {}'.format(self.channels))
-                return None
-
-        while self.gpio.get_input(self.channels.get('in')) == 1:
-            pulse_end = time.time()
-            if pulse_end - read_start > 1000:
-                self.logger.error('Sensor timed out waiting for pulse end channels {}'.format(self.channels))
-                return None
-
-        if pulse_start is not None and pulse_end is not None:
-            pulse_duration = pulse_end - pulse_start
-            distance = pulse_duration * (self.speed_of_sound * self.FACTOR)
-
+        value = sensor.Measurement(self.trigger,
+                                   self.echo,
+                                   temperature=self.correction.value)
+        try:
+            distance = value.raw_distance(sample_size=11, sample_wait=0.2)
             return round(distance, 2)
+        except SystemError:
+            self.logger.error('echo pulse not recieved {}'.format(self.channels))
+
