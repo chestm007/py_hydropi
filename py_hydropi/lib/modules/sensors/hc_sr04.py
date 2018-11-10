@@ -1,4 +1,25 @@
-from hcsr04sensor import sensor
+import os
+
+if os.environ.get('PY_HYDROPI_TESTING').lower() != 'true':
+    from hcsr04sensor import sensor
+else:
+    class Sensor:
+        class Measurement:
+            def __init__(self, trig, echo, temperature=20):
+                assert type(trig) == int
+                assert type(echo) == int
+                assert type(temperature) in (float, int)
+
+                self.trig = trig
+                self.echo = echo
+                self.temperature = temperature
+                self.sample_size = sample_size
+                self._value = 50
+
+            def raw_distance(self, sample_size=1):
+                assert type(sample_size) == int
+                return self._value
+    sensor = Sensor()
 
 from py_hydropi.lib.modules.inputs import Input
 
