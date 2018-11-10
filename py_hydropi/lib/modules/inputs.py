@@ -67,7 +67,6 @@ class Input(ThreadedDaemon):
 
     def _main_loop(self):
         while self._continue:
-            time.sleep(self.frequency)
             vals = []
             for i in range(self._samples):
                 v = self._read()
@@ -75,35 +74,13 @@ class Input(ThreadedDaemon):
                     vals.append(self.value_processor(v))
             if vals:
                 self._value = avg(vals)
+            time.sleep(self.frequency)
 
     def _read(self):
         raise NotImplementedError
 
 
-if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
-    class Input(Input):
-        falling = True
-        _value = 20
-        _test_moving_temp = True
-
-        def _read(self):
-            if self._test_moving_temp:
-                print(self.__class__.__name__, self._value)
-                if self.falling:
-                    if self._value < 15:
-                        self.falling = False
-                    self._value -= 0.1
-                    return self._value
-                else:
-                    if self._value > 25:
-                        self.falling = True
-                    self._value += 0.1
-                    return self._value
-            else:
-                return 20
-
-
-from py_hydropi.lib.modules.sensors.dhtxx import DHTxxInput, DHT11Input, DHT22Input
+from py_hydropi.lib.modules.sensors.dhtxx import DHT11Input, DHT22Input
 from py_hydropi.lib.modules.sensors.one_wire import OneWireInput
 from py_hydropi.lib.modules.sensors.hc_sr04 import UltrasonicInput
 from py_hydropi.lib.modules.sensors.homelab_ph import HomeLabPH

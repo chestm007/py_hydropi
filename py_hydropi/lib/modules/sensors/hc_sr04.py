@@ -5,10 +5,11 @@ if os.environ.get('PY_HYDROPI_TESTING').lower() != 'true':
 else:
     class Sensor:
         class Measurement:
-            def __init__(self, trig, echo, temperature=20):
+            def __init__(self, trig, echo, temperature=20, sample_size=1):
                 assert type(trig) == int
                 assert type(echo) == int
                 assert type(temperature) in (float, int)
+                assert type(sample_size) == int
 
                 self.trig = trig
                 self.echo = echo
@@ -16,7 +17,7 @@ else:
                 self.sample_size = sample_size
                 self._value = 50
 
-            def raw_distance(self, sample_size=1):
+            def raw_distance(self, sample_size=1, **_):
                 assert type(sample_size) == int
                 return self._value
     sensor = Sensor()

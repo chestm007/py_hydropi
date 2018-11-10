@@ -3,9 +3,10 @@ import time
 
 if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     class Adafruit_DHT:
-        @staticmethod
-        def read_retry(_, channel):
-            return 10, 10
+        value = 10, 10
+        @classmethod
+        def read_retry(cls, _, channel):
+            return cls.value
 else:
     import Adafruit_DHT
 
@@ -36,9 +37,9 @@ class DHTxxInput(Input):
         except IndexError:
             self.logger.error('error processing response from sensor channel {}({})'.format(
                 self.channel, self.value_index))
-        except Exception:
-            self.logger.error('error reading from {}: channel {}({})'.format(
-                self.__class__.__name__, self.channel, self.value_index))
+        except Exception as e:
+            self.logger.error('{} error reading from {}: channel {}({})'.format(
+                e, self.__class__.__name__, self.channel, self.value_index))
         if val is None:
             self.logger.error('{}: {}({}) returned None'.format(
                 self.__class__.__name__, self.channel, self.value_index))

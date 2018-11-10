@@ -13,3 +13,7 @@ class MemDatabase(object):
         group = self.controllers.get(type_)
         if group:
             return group.get(name_)
+
+    @property
+    def inputs(self):
+        return self._inputs

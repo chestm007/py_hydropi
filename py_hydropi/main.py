@@ -33,7 +33,7 @@ class RaspberryPiTimer(object):
         if self.api_config.start:
             self.api = ApiServer(self.db, self.api_config)
 
-        self.setup_IO()
+        self.setup_io()
 
         if self.metrics_config.enabled:
             self.metrics_controller = MetricCollectorController(
@@ -78,7 +78,7 @@ class RaspberryPiTimer(object):
                 self.stop()
                 break
 
-    def stop(self, *args):
+    def stop(self, *_):
         self.logger.info('stopping all services')
         if hasattr(self, 'api'):
             self.logger.info('Shutting down API server')
@@ -94,19 +94,19 @@ class RaspberryPiTimer(object):
             self.metrics_controller.stop()
 
         self.logger.info('Terminating input reader loops.')
-        for sensor in self.db._inputs.values():
+        for sensor in self.db.inputs.values():
             sensor.stop()
 
         self.cleanup()
 
-    def setup_IO(self):
+    def setup_io(self):
         self.logger.info('loading sensors...')
         sensor_config = self.module_config.config.get('sensors')
         if sensor_config is not None:
             self.db._inputs = Input.load_config(self, sensor_config)
             self.logger.info('waiting 10 seconds for sensors to stabilize...')
             time.sleep(10)
-            for sensor in self.db._inputs.values():
+            for sensor in self.db.inputs.values():
                 sensor.start()
 
         self.logger.info('loading timers...')
