@@ -4,12 +4,11 @@ group: stable
 language: python
 python:
   - '3.6'
-  - '3.7'
   - '3.5'
 install:
-  - pip install
+  - pip install .
 script:
-  - python run_tests.py
+  - python tests/run_tests.py
 deploy:
   provider: pypi
   user: "chestm007"
