@@ -5,7 +5,7 @@ language: python
 python:
   - '3.6'
   - '3.5'
-before_install: :
+before_install:
   - sudo apt-get update
   - 'sudo apt-get install -y libsystemd-{journal,daemon,login,id128}-dev gcc python3-dev'
 install:
