@@ -13,7 +13,6 @@ script: python tests/run_tests.py
 jobs:
   include:
     - stage: deploy
-      if: (tag IS present) AND (branch = master)
       python: '3.6'
       deploy:
         provider: pypi
