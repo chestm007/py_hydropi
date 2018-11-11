@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -y libsystemd-dev gcc python3-dev build-essential
 install:
-  - pip install . --no-deps -r test_requirements.txt
+  - pip install . -r test_requirements.txt
 script:
   - python tests/run_tests.py
 deploy:
