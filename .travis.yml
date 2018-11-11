@@ -7,7 +7,7 @@ python:
   - '3.5'
 before_install:
   - sudo apt-get update
-  - udo apt-get install -y libsystemd-{journal,daemon}-dev libsystemd-dev gcc python3-dev build-essential
+  - sudo apt-get install -y libsystemd-{journal,daemon}-dev libsystemd-dev gcc python3-dev build-essential
 install:
   - pip install . --no-deps -r test_requirements.txt
 script:
