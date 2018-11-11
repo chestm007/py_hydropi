@@ -1,7 +1,0 @@
-RPi.GPIO
-PyYAML
-cherrypy
-Adafruit_Python_DHT
-systemd
-hcsr04sensor
-requests

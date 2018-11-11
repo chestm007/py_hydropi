@@ -1,5 +1,0 @@
-PyYAML==3.12
-cherrypy==13.1.0
-systemd
-pep8
-requests
