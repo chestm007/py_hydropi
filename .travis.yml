@@ -3,20 +3,20 @@ dist: xenial
 group: stable
 language: python
 python:
-  - '3.6'
-  - '3.5'
+- '3.6'
+- '3.5'
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y libsystemd-dev gcc python3-dev build-essential
+- sudo apt-get update
+- sudo apt-get install -y libsystemd-dev gcc python3-dev build-essential
 install:
-  - pip install .
+- pip install .
 script:
-  - python tests/run_tests.py
+- python tests/run_tests.py
 deploy:
   provider: pypi
-  user: "chestm007"
+  user: chestm007
   password:
-    secure: "n7adHupi7Ii0YNqRDXXxycMMUMKt5sLPhNAoiQTk8Lv6Vq3ywsclDaJyAgOaGv2jKULJt3TzJMrBioB40L4LXJSmHcFOpgxyOQ/x6qEmD6uKZNDYbCuY9lNhm9Bg+8UMfxjWhVI3z+NeIB7EHBlZdTlJaOErsY1ki4rWlLMyke0C69JMvup6rZSMKdZft8CDVCpexcBvXUkwxRE2v/Ovy/kbpIOeqHMG0XKmQL+Ah7XvZMVuvRF51LpAZqJgjdWF4A34Qnxi8yy6EzlYdlWe2FTflurAuJk/IuJU5+fWkPHf7jNAklqec8Gm6jIjYplku151tIGdgk/TH5AalhzVfg14B1r5otLFToGvFPnmq5sn3Ud0bQokAcyU7d96Hb718eU16vlNdgRzTbJcI4vCTV/cM4z0L3P3anJ0CBFGXoAQL6Tmehdsm9JQSuhSC0/oepBEaHLYLXhm5m9HtDPvCz3aDPbBFpbyM7hb3p2+kx0evKXWCwxcnbKzcoIvrLf303d4mBqD1LmMHHT2X3WsStTVmfHJrEXlr/Xq65JIsFE52af/1JEiLjE6xTt/8wemQyESgD6BOpBDtATHX8MSElxtviQp5IjWobYfinw3qFH4WUdH2JuRAzYoSgfZZ+29lcn/daKLoU+G+p60NN02avgKfiW9orKMIIkq5Gvz00w="
+    secure: SJRxULhbwnNnVdK+NiUT82NEqpfwAW3d6Z5ioqAU30FbvJb9aVe+qJbN4HjYxJJAYGkj95pBXIvD9+HuTBtstdL7GQS/m2GCt9WExNDJGG/8m4DC2VVsRhRblZFP1f423sWvldQtU+1SVUrMA/caO40qqbDA8SXUDl82A21DAMHs2tpKuvwpNMpLvZbb/Di5cOTbzL+NB5PJJ1jzqKIQgJav1qONBQoZFgmkR4fbDTnerIj29sHm5S6lG4qBv39y0oPWkCWwN2MJpUT3jdbC26MyWNUcVIvwnQ37XpnRSgjG1sLUNk5O9UCFFHocOl3JzHp9wlkZIbJoxw4yR8TWrLF2mWSYSJMy+l0ii/B9QAXrL0tqLRe76WjRgMPp08skCtwSyXyLfY4hHOVdBapHXfgvX+jFvv6hbPEXL4tdMyQNDAoBsAFU0VmoFgsrK1bqt7RkRIpmpj/wArteYsHO+QJxptD884xAcZAqnToGaMA5IgpkQQWJw0/RANH7x1E/so24dMdeoiPDBMbWFUKXaSsUzeD4YQXS90nTbw1LMM75YaNWxTkRit23vEix6Gk62CJvIhYVpOZZAFgiU+Yu8CSYOqiYIntsU5XjOD5FhKDjKz97gEju2b0kAUoJYOeOSsVnjXNUipUSVYCgRLMv1LFlx0l0XK7WYfHMh5qk2ew=
   on:
     branch: master
     tags: true

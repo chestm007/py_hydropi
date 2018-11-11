@@ -1,11 +1,12 @@
+import time
 from distutils.core import setup
 import os
 
 from setuptools import find_packages
 
 required_packages = [
-    'PyYAML>=3.12',
-    'cherrypy>=13.1.0',
+    'PyYAML',
+    'cherrypy',
     'systemd',
     'pep8',
     'requests'
@@ -19,12 +20,19 @@ if is_rasp_pi:
         'hcsr04sensor'
     ])
 
+VERSION = os.environ.get('TRAVIS_TAG') or '0.0.0.post{}'.format(int(time.time()))
+
 setup(
     name='py_hydropi',
-    version='1.0.0',
+    version=VERSION,
+    url='https://github.com/chestm007/py_hydropi',
     packages=find_packages(),
+    author='max',
+    author_email='chestm007@hotmail.com',
+    license='GPL-2.0',
+    requires=required_packages,
     include_package_data=True,
-    description='',
+    description='Hydroponics controller for RaspberryPi',
     install_requires=required_packages,
     entry_points="""
         [console_scripts]
