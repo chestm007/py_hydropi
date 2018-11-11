@@ -1,4 +1,3 @@
-import builtins
 import signal
 
 from multiprocessing import Queue

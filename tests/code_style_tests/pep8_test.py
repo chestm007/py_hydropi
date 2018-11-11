@@ -14,7 +14,7 @@ def ignore(string):
     """
     patterns = ('.svn', 'bin', 'htmlcov', '.egg-info', 'setup', '.idea', '.xml', '.iml', '.txt', '.jar', '.keystore',
                 '.vscode', '.pyc', '.coverage', '.cfg', '.noseids', '.gitignore', '.html', 'README', 'shakedown.py',
-                '.sql', '.sh', '.json', '.DS_Store', '.swp', 'psql', '.git', 'venv', '.yaml', '.yml', 'cover')
+                '.sql', '.sh', '.json', '.DS_Store', '.swp', 'psql', '.git', 'venv', '.yaml', '.yml', 'cover', 'dist')
     for pattern in patterns:
         if pattern in string:
             return True
