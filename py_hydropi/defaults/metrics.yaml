@@ -4,4 +4,5 @@ reporter:
     port: 8086
     hostname: testpipytimer2  # if not specified defaults to the pi's hostname
     db: py_hydropi
+    timeout: 0.5
 frequency: 5
