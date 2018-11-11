@@ -5,6 +5,9 @@ language: python
 python:
   - '3.6'
   - '3.5'
+before_install: :
+  - sudo apt-get update
+  - sudo apt-get install -y libsystemd-{journal,daemon,login,id128}-dev gcc python3-dev
 install:
   - pip install . --no-deps -r test_requirements.txt
 script:
