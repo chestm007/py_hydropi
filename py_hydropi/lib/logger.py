@@ -11,26 +11,35 @@ class Logger(object):
     WARNING = logging.WARNING
     ERROR = logging.ERROR
 
-    def __init__(self, obj, debug=True):
-        self.level = self.INFO
-        if os.environ.get('PY_HYDROPI_TESTING', '').lower():
-            env_level = os.environ.get('PY_HYDROPI_LOGGING', '').lower()
-            if env_level:
-                self.level = getattr(self, env_level)
-
+    def __init__(self, obj):
+        if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
             class ScreenLogger(logging.Logger):
-                warning = print
-                info = print
-                error = print
-                debug = print
+                def error(self, msg, *args, **kwargs):
+                    if self.level <= Logger.ERROR:
+                        print(msg.format(*args, **kwargs))
+
+                def warning(self, msg, *args, **kwargs):
+                    if self.level <= Logger.WARNING:
+                        print(msg.format(*args, **kwargs))
+
+                def debug(self, msg, *args, **kwargs):
+                    if self.level <= Logger.DEBUG:
+                        print(msg.format(*args, **kwargs))
+
+                def info(self, msg, *args, **kwargs):
+                    if self.level <= Logger.INFO:
+                        print(msg.format(*args, **kwargs))
+
             self._logger = ScreenLogger(obj)
         else:
             self._logger = logging.getLogger(obj)
             if not self._logger.handlers:
                 self._logger.addHandler(journal.JournaldLogHandler())
-        if debug:
-            self.level = self.DEBUG
-        self._logger.setLevel(self.level or self.INFO)
+
+        env_level = os.environ.get('PY_HYDROPI_LOGGING', '').upper() or 'INFO'
+        level = getattr(self, env_level) or self.INFO
+        self._logger.setLevel(level)
+
         self.calling_obj = obj
 
     def warn(self, msg, *args, **kwargs):
@@ -57,4 +66,3 @@ class Logger(object):
 
         if level == self.ERROR:
             self.error(msg)
-

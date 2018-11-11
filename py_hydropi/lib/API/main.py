@@ -11,13 +11,15 @@ from cherrypy import _cpwsgi_server, _cpserver
 
 class ApiServer(object):
     def __init__(self, db, config, service_name='cherrypy'):
-        self.config = config
         self.logger = Logger(service_name)
         self.is_running = False
         self.strict_port_checking = False
         self.adapter = None  # type: _cpserver.ServerAdapter
         self.logger = Logger('api')
         self.cherrypy_server = _cpwsgi_server.CPWSGIServer()
+        if not hasattr(self, 'config'):
+            self.load_config(config)
+
         self.db = db  # type: MemDatabase
         self.exit = None
 
@@ -36,6 +38,12 @@ class ApiServer(object):
         cherrypy.log.error_log.propagate = False
         cherrypy._cpchecker.Checker.on = False  # stops cherrypy checking for config
         cherrypy.engine.signals.subscribe()
+        cherrypy.config.update(
+            {
+                'global': {
+                    'engine.autoreload.on': False
+                }
+            })
         cherrypy.log.access_log.log = self.logger.log
         cherrypy.log.access_log.propagate = False
         cherrypy.engine.start()
@@ -85,4 +93,3 @@ class ApiServer(object):
                                                 'tools.response_headers.headers': [('Content-Type', 'text/plain')]
                                             }
                                         })
-

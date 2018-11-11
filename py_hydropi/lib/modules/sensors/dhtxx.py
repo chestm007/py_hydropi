@@ -4,6 +4,7 @@ import time
 if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     class Adafruit_DHT:
         value = 10, 10
+
         @classmethod
         def read_retry(cls, _, channel):
             return cls.value

@@ -88,5 +88,3 @@ class GPIO(object):
 
     def cleanup(self):
         self._GPIO.cleanup()
-
-

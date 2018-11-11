@@ -79,6 +79,9 @@ class Input(ThreadedDaemon):
     def _read(self):
         raise NotImplementedError
 
+    def to_json(self):
+        return 'foo'
+
 
 from py_hydropi.lib.modules.sensors.dhtxx import DHT11Input, DHT22Input
 from py_hydropi.lib.modules.sensors.one_wire import OneWireInput

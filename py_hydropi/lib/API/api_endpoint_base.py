@@ -29,13 +29,13 @@ class APIEndpointBase(object):
     def DELETE(self):
         return self._delete(cherrypy.request.json)
 
-    def _delete(self, data):
+    def _delete(self, *args, **kwargs):
         raise self.error_405
 
-    def _put(self, data):
+    def _put(self, *args, **kwargs):
         raise self.error_405
 
-    def _post(self, data):
+    def _post(self, *args, **kwargs):
         raise self.error_405
 
     def _get(self):

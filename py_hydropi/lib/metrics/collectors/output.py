@@ -19,4 +19,3 @@ class OutputMetricCollector:
 
         return [('channel{channel}activated'.format(channel=output.channel), int(output.state))
                 for output in outputs]
-

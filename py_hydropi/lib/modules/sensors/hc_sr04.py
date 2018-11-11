@@ -65,4 +65,3 @@ class UltrasonicInput(Input):
             return round(distance, 2)
         except Exception as e:
             self.logger.error('{} channels:{}'.format(e, self.channels))
-

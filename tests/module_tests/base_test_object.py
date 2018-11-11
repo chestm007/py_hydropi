@@ -1,13 +1,15 @@
 from py_hydropi.lib import Output
 from py_hydropi.lib.modules.inputs import Input
+import unittest
 
 
-class BaseTestObject:
+class BaseTestObject(unittest.TestCase):
     class MockOutput(Output):
         def __init__(self, channel):
             self.channel = channel
             self.active = False
             self.manual_control = False
+            self.state = False
 
         def activate(self):
             self.active = True
@@ -22,4 +24,3 @@ class BaseTestObject:
 
         def __init__(self):
             self.falling = True
-

@@ -1,6 +1,7 @@
 import time
 
 from py_hydropi.lib import Output, parse_simple_time_string
+from py_hydropi.lib.iter_utils import JSONableDict
 from py_hydropi.lib.modules.inputs import Input
 from py_hydropi.lib.modules.switch import Switch
 from py_hydropi.lib.modules.timer import SimpleTimer
@@ -52,6 +53,18 @@ class ThresholdSwitch(Switch):
             assert self.alter_func
 
         self.threshold_timer = None
+
+    @property
+    def all_outputs(self):
+        out = super().all_outputs
+        out.extend([self._rising_object, self._falling_object])
+        return out
+
+    def to_json(self):
+        return JSONableDict(target=self._target,
+                            poll_sec=self._poll_sec,
+                            upper_limit=self._upper,
+                            lower_limit=self._lower)
 
     @staticmethod
     def factory(**kwargs):
@@ -190,8 +203,8 @@ class TargetThresholdSwitch(ThresholdSwitch):
         else:
             if self._min_duty_cycle and not self.threshold_timer:
                 self.threshold_timer = SimpleTimer(
-                    '{}s'.format(int(60*self._min_duty_cycle)),
-                    '{}s'.format(int(60 - (60*self._min_duty_cycle))))
+                    '{}s'.format(int(60 * self._min_duty_cycle)),
+                    '{}s'.format(int(60 - (60 * self._min_duty_cycle))))
                 self.threshold_timer.attached_outputs.append(self._falling_object)
                 self.threshold_timer.start()
 

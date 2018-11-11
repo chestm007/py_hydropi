@@ -39,4 +39,3 @@ class InfluxDBClient:
                                    headers={'Content-Type': 'application/octet-stream'})
             if result.status_code != SUCCESS:
                 callback([result.status_code, result.reason])
-

@@ -1,6 +1,6 @@
 from py_hydropi.lib.API.api_endpoint_base import APIEndpointBase
 
 
-class Api(APIEndpointBase):
+class Controllers(APIEndpointBase):
     def _get(self):
-        return ['outputs', 'controllers']
+        return self.api.db.controllers.to_json()

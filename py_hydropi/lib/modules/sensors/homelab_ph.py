@@ -21,4 +21,3 @@ class HomeLabPH(Input):
 
         except Exception as e:
             self.logger.error(e)
-

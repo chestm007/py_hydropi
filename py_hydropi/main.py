@@ -1,3 +1,4 @@
+import builtins
 import signal
 
 from multiprocessing import Queue
@@ -5,6 +6,7 @@ from multiprocessing import Queue
 import time
 
 from py_hydropi.lib.config import ApiConfig, MetricsConfig
+from py_hydropi.lib.iter_utils import JSONableDict
 from py_hydropi.lib.memdatabase import MemDatabase
 from py_hydropi.lib.metrics.collector_controller import MetricCollectorController
 from py_hydropi.lib.metrics.collectors.output import OutputMetricCollector
@@ -13,9 +15,9 @@ from py_hydropi.lib.modules.inputs import Input
 from py_hydropi.lib.modules.threshold_switch import ThresholdSwitch
 from py_hydropi.lib.modules.timer import SimpleTimer, ClockTimer
 
-from .lib.API.main import ApiServer
 
 from .lib import Logger, Output, ModuleConfig, GPIO
+from .lib.API.main import ApiServer
 
 
 class RaspberryPiTimer(object):
@@ -112,16 +114,16 @@ class RaspberryPiTimer(object):
         self.logger.info('loading timers...')
         clock_config = self.module_config.config.get('clock_timer')
         if clock_config is not None:
-            self.db.controllers['clock_timer'] = ClockTimer.load_config(self, clock_config)
+            self.db.controllers['clock_timer'] = JSONableDict(ClockTimer.load_config(self, clock_config))
 
         simple_config = self.module_config.config.get('simple_timer')
         if simple_config is not None:
-            self.db.controllers['simple_timer'] = SimpleTimer.load_config(self, simple_config)
+            self.db.controllers['simple_timer'] = JSONableDict(SimpleTimer.load_config(self, simple_config))
 
         self.logger.info('loading switches...')
         threshold_config = self.module_config.config.get('threshold')
         if threshold_config is not None:
-            self.db.controllers['threshold'] = ThresholdSwitch.load_config(self, threshold_config)
+            self.db.controllers['threshold'] = JSONableDict(ThresholdSwitch.load_config(self, threshold_config))
 
         triggered_config = self.module_config.config.get('triggered')
         if triggered_config is not None:

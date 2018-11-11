@@ -14,6 +14,13 @@ class Timer(Switch):
         self.deactivated_time = None  # type: datetime
         self.triggered_outputs_activated = False
 
+    @property
+    def all_outputs(self):
+        out = super().all_outputs
+        for outputs in self.attached_triggered_outputs.values():
+            out.extend(outputs.get('objects'))
+        return out
+
     def _activate_objects(self, activated_time=None):
         if not self.outputs_activated:
             self.activated_time = activated_time or datetime.now()

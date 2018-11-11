@@ -7,6 +7,10 @@ class Switch(ThreadedDaemon):
         self.attached_outputs = []
         self.outputs_activated = None
 
+    @property
+    def all_outputs(self):
+        return list(self.attached_outputs)
+
     @classmethod
     def load_config(cls, raspberry_pi_timer, config):
         raise NotImplementedError
@@ -41,4 +45,3 @@ class Switch(ThreadedDaemon):
     def stop(self):
         super().stop()
         self._deactivate_objects()
-
