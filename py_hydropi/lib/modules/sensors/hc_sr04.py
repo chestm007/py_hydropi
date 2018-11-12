@@ -1,6 +1,6 @@
 import os
 
-if os.environ.get('PY_HYDROPI_TESTING').lower() != 'true':
+if os.environ.get('PY_HYDROPI_TESTING', '').lower() != 'true':
     from hcsr04sensor import sensor
 else:
     class Sensor:
