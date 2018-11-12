@@ -1,8 +1,8 @@
 reporter:
   influxdb:
-    endpoint: 192.168.1.2
+    endpoint: 127.0.0.1
     port: 8086
-    hostname: testpipytimer2  # if not specified defaults to the pi's hostname
+    hostname: py_hydropi  # if not specified defaults to the pi's hostname
     db: py_hydropi
     timeout: 0.5
 frequency: 5
