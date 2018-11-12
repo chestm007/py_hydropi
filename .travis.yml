@@ -13,21 +13,17 @@ python:
 - '3.6'
 - '3.5'
 - '3.4'
-- '3.3'
-- '2.7'
 matrix:
   allow_failures:
   - python:
       - 3.7
       - 3.4
-      - 3.3
-      - 2.7
 script: python tests/run_tests.py
 jobs:
   include:
     - stage: deploy
-      script: sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
-      python: '3.6'
+      skip_cleanup: true
+      python: '3.5'
       deploy:
         provider: pypi
         user: chestm007
