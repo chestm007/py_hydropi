@@ -22,13 +22,12 @@ script: python tests/run_tests.py
 jobs:
   include:
     - stage: deploy
-      skip_cleanup: true
       python: '3.5'
       deploy:
+        skip_cleanup: true
         provider: pypi
         user: chestm007
         password:
           secure: SJRxULhbwnNnVdK+NiUT82NEqpfwAW3d6Z5ioqAU30FbvJb9aVe+qJbN4HjYxJJAYGkj95pBXIvD9+HuTBtstdL7GQS/m2GCt9WExNDJGG/8m4DC2VVsRhRblZFP1f423sWvldQtU+1SVUrMA/caO40qqbDA8SXUDl82A21DAMHs2tpKuvwpNMpLvZbb/Di5cOTbzL+NB5PJJ1jzqKIQgJav1qONBQoZFgmkR4fbDTnerIj29sHm5S6lG4qBv39y0oPWkCWwN2MJpUT3jdbC26MyWNUcVIvwnQ37XpnRSgjG1sLUNk5O9UCFFHocOl3JzHp9wlkZIbJoxw4yR8TWrLF2mWSYSJMy+l0ii/B9QAXrL0tqLRe76WjRgMPp08skCtwSyXyLfY4hHOVdBapHXfgvX+jFvv6hbPEXL4tdMyQNDAoBsAFU0VmoFgsrK1bqt7RkRIpmpj/wArteYsHO+QJxptD884xAcZAqnToGaMA5IgpkQQWJw0/RANH7x1E/so24dMdeoiPDBMbWFUKXaSsUzeD4YQXS90nTbw1LMM75YaNWxTkRit23vEix6Gk62CJvIhYVpOZZAFgiU+Yu8CSYOqiYIntsU5XjOD5FhKDjKz97gEju2b0kAUoJYOeOSsVnjXNUipUSVYCgRLMv1LFlx0l0XK7WYfHMh5qk2ew=
         on:
           branch: master
-          tags: true
