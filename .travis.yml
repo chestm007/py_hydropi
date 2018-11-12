@@ -5,7 +5,10 @@ language: python
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y libsystemd-dev gcc python3-dev build-essential
-install: pip install .
+install:
+  - sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
+  - python get_build_version.py
+  - pip install .
 python:
 - '3.6'
 - '3.5'
