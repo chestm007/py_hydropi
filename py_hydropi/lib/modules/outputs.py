@@ -1,6 +1,6 @@
 import os
 
-from ..logger import Logger
+from py_hydropi.lib import Logger
 
 
 class Output:

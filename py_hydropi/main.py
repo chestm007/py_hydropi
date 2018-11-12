@@ -15,8 +15,8 @@ from py_hydropi.lib.modules.threshold_switch import ThresholdSwitch
 from py_hydropi.lib.modules.timer import SimpleTimer, ClockTimer
 
 
-from .lib import Logger, Output, ModuleConfig, GPIO
-from .lib.API.main import ApiServer
+from py_hydropi.lib import Logger, Output, ModuleConfig, GPIO
+from py_hydropi.lib.API.main import ApiServer
 
 
 class RaspberryPiTimer(object):
