@@ -3,7 +3,7 @@ import os
 
 from py_hydropi.lib.memdatabase import MemDatabase
 
-from py_hydropi.lib import Logger
+from py_hydropi.lib.logger import Logger
 
 # noinspection PyProtectedMember
 from cherrypy import _cpwsgi_server, _cpserver

@@ -1,4 +1,4 @@
-from py_hydropi.lib import Output
+from py_hydropi.lib.modules.outputs import Output
 from py_hydropi.lib.modules.inputs import Input
 import unittest
 
