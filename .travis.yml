@@ -9,8 +9,19 @@ install:
   - sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
   - pip install .
 python:
+- '3.7'
 - '3.6'
 - '3.5'
+- '3.4'
+- '3.3'
+- '2.7'
+matrix:
+  allow_failures:
+  - python:
+      - 3.7
+      - 3.4
+      - 3.3
+      - 2.7
 script: python tests/run_tests.py
 jobs:
   include:
