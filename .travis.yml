@@ -15,6 +15,7 @@ script: python tests/run_tests.py
 jobs:
   include:
     - stage: deploy
+      script: sed -i "s/PROJECTVERSION/`python get_build_version.py`/g" setup.py
       python: '3.6'
       deploy:
         provider: pypi
