@@ -1,4 +1,5 @@
 import os
 import time
 
-print(os.environ.get('TRAVIS_TAG') or '0.0.0.post{}'.format(int(time.time())))
+last_tag = os.popen('git describe --abbrev=0 --tags').read().strip()
+print(os.environ.get('TRAVIS_TAG') or '{}.post{}'.format(last_tag, int(time.time())))

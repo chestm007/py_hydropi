@@ -24,7 +24,7 @@ VERSION = os.environ.get('TRAVIS_TAG') or '0.0.0.post{}'.format(int(time.time())
 
 setup(
     name='py_hydropi',
-    version=PROJECTVERSION,
+    version='PROJECTVERSION',
     url='https://github.com/chestm007/py_hydropi',
     packages=find_packages(),
     author='max',
