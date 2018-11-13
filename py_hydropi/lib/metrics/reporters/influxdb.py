@@ -1,3 +1,4 @@
+import os
 import time
 
 import requests
@@ -8,7 +9,7 @@ from py_hydropi.lib.logger import Logger
 SUCCESS = 204
 
 
-class InfluxDBClient:
+class _InfluxDBClient:
     def __init__(self, endpoint="127.0.0.1", port=8086, hostname=None, db='py_hydropi', timeout=0.5):
         self.logger = Logger(self.__class__.__name__)
         self.endpoint = endpoint
@@ -40,3 +41,14 @@ class InfluxDBClient:
                                    headers={'Content-Type': 'application/octet-stream'}, timeout=self.timeout)
             if result.status_code != SUCCESS:
                 callback([result.status_code, result.reason])
+
+
+if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
+    class InfluxDBClient(_InfluxDBClient):
+        def push(self, callback, metric, value):
+            self.logger.debug('metric: {}, value: {}'.format(metric, value))
+            if value is not None:
+                callback([200, 'success'])
+
+else:
+    InfluxDBClient = _InfluxDBClient
