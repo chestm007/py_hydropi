@@ -101,7 +101,6 @@ class RaspberryPiTimer(object):
 
         self.cleanup()
         self.logger.info('system shutdown complete')
-        sys.exit(0)
 
     def setup_io(self):
         self.logger.info('loading sensors...')
