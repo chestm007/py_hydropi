@@ -88,7 +88,6 @@ class Timer(Switch):
             self._check_after_trigger()
             self._check_before_trigger()
             sleep(0.1)
-        self.stop()
 
     def stop(self):
         for group in self.attached_triggered_outputs.keys():

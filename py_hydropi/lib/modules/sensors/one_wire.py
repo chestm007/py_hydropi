@@ -31,4 +31,4 @@ class OneWireInput(Input):
 
         except FileNotFoundError:
             self.logger.error('specified sensor not found: {}\nexiting monitoing thread'.format(self._sensor_path))
-            self.stop()
+            self._continue = False

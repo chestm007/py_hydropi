@@ -18,6 +18,8 @@ class ThreadedDaemon:
     def stop(self):
         self.logger.info('recieved exit command, stopping terminating daemon main loop')
         self._continue = False
+        if self._thread.is_alive():
+            self._thread.join(timeout=self.frequency if hasattr(self, 'frequency') else 20)
 
     def _main_loop(self):
         raise NotImplementedError

@@ -1,4 +1,5 @@
 import signal
+import sys
 
 from multiprocessing import Queue
 
@@ -99,14 +100,14 @@ class RaspberryPiTimer(object):
             sensor.stop()
 
         self.cleanup()
+        self.logger.info('system shutdown complete')
+        sys.exit(0)
 
     def setup_io(self):
         self.logger.info('loading sensors...')
         sensor_config = self.module_config.config.get('sensors')
         if sensor_config is not None:
             self.db._inputs = Input.load_config(self, sensor_config)
-            self.logger.info('waiting 10 seconds for sensors to stabilize...')
-            time.sleep(10)
             for sensor in self.db.inputs.values():
                 sensor.start()
 
