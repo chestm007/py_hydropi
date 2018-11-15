@@ -4,27 +4,27 @@ from .logger import Logger
 
 if os.environ.get('PY_HYDROPI_TESTING', '').lower() == 'true':
     # noinspection PyUnusedLocal
-    class RPIGPIO(object):
-        class Bcm(object):
+    class RPIGPIO:
+        class Bcm:
             pass
 
-        class In(object):
+        class In:
             pass
 
-        class Out(object):
+        class Out:
             pass
 
-        class High(object):
+        class High:
             pass
 
-        class Low(object):
+        class Low:
             pass
 
         BCM = Bcm()
         IN = In()
         OUT = Out()
-        HIGH = High()
-        LOW = Low()
+        HIGH = High()  # OFF
+        LOW = Low()    # ON
 
         @staticmethod
         def setmode(mode):

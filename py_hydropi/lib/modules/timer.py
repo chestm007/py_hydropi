@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from time import sleep
 
 from py_hydropi.lib import Output
@@ -126,16 +126,24 @@ class ClockTimer(Timer):
     def _get_current_time():
         return datetime.now()
 
-    def _check_timer(self):
-        now = self._get_current_time()
-        if self.outputs_activated:
-            off_datetime = time_to_datetime(now, self.off_time)
-            if now > off_datetime and (self.activated_time is None or off_datetime > self.activated_time):
-                self._deactivate_objects(off_datetime)
+    @staticmethod
+    def time_in_range(start, end, x):
+        """Return true if x is in the range [start, end]"""
+        if start <= end:
+            return start <= x <= end
         else:
-            on_datetime = time_to_datetime(now, self.on_time)
-            if now > on_datetime and (self.deactivated_time is None or on_datetime > self.deactivated_time):
-                self._activate_objects(on_datetime)
+            return start <= x or x <= end
+
+    def _check_timer(self):
+        now = self._get_current_time().time()
+        on = time_to_datetime(now, self.on_time).time()
+        off = time_to_datetime(now, self.off_time).time()
+        if self.outputs_activated:
+            if self.time_in_range(off, on, now):
+                self._deactivate_objects(now)
+        else:
+            if self.time_in_range(on, off, now):
+                self._activate_objects(now)
 
     def _check_before_trigger(self):
         for group_name, opts in self.attached_triggered_outputs.items():
