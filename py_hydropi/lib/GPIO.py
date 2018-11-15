@@ -73,13 +73,13 @@ class GPIO(object):
 
     def set_output_on(self, channel):
         try:
-            self._GPIO.output(channel, self._GPIO.HIGH)
+            self._GPIO.output(channel, self._GPIO.LOW)
         except RuntimeError:
             self.logger.error('error setting channel {} on'.format(channel))
 
     def set_output_off(self, channel):
         try:
-            self._GPIO.output(channel, self._GPIO.LOW)
+            self._GPIO.output(channel, self._GPIO.HIGH)
         except RuntimeError:
             self.logger.error('error setting channel {} off'.format(channel))
 
