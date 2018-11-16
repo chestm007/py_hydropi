@@ -10,20 +10,19 @@ class TestSimpleTimer(BaseTestObject):
     @classmethod
     def setUpClass(cls):
         cls.output = cls.MockOutput(1)
-        cls.simpletimer = SimpleTimer(on_time='0.1s', off_time='0.1s')\
+        cls.simpletimer = SimpleTimer(on_time='1s', off_time='1s')\
             .attach_object(cls.output)\
             .start()
-        time.sleep(0.2)
 
     def test_intervals(self):
         if self.output.active:
-            time.sleep(0.1)
+            time.sleep(1.5)
 
-        for i in range(2):
+        for i in range(1):
             self.assertFalse(self.output.active)
-            time.sleep(0.1)
+            time.sleep(1)
             self.assertTrue(self.output.active)
-            time.sleep(0.1)
+            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
