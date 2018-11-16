@@ -36,9 +36,13 @@ class _InfluxDBClient:
                 value=value,
                 timestamp=self._get_current_timestamp()
             )
-            result = requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
-                                   data=payload,
-                                   headers={'Content-Type': 'application/octet-stream'}, timeout=self.timeout)
+            try:
+                result = requests.post(url='http://{}:{}/write?db={}'.format(self.endpoint, self.port, self.db),
+                                       data=payload,
+                                       headers={'Content-Type': 'application/octet-stream'}, timeout=self.timeout)
+            except requests.exceptions.ConnectTimeout:
+                self.logger.error('Timeout while reporting metrics')
+                return
             if result.status_code != SUCCESS:
                 callback([result.status_code, result.reason])
 

@@ -43,15 +43,27 @@ class TestClockTimer(BaseTestObject):
         self.clock_timer._check_timer()
         self.assertTrue(self.output.active)
 
-    def test_now_before_overnight_active_6am(self):
+    def test_now_overnight_active_4pm_3am(self):
         self.clock_timer.on_time = '4:00pm'
         self.clock_timer.off_time = '3:00am'
-        for i in range(4, 16):
+        for i in range(3):
+            self.current_hour = i
+            self.clock_timer._check_timer()
+            self.assertTrue(self.output.active, msg=i)
+        for i in range(3, 16):
             self.current_hour = i
             self.clock_timer._check_timer()
             self.assertFalse(self.output.active, msg=i)
+        for i in range(16, 24):
+            self.current_hour = i
+            self.clock_timer._check_timer()
+            self.assertTrue(self.output.active, msg=i)
+        for i in range(3):
+            self.current_hour = i
+            self.clock_timer._check_timer()
+            self.assertTrue(self.output.active, msg=i)
 
-    def test_now_before_overnight_active_1am(self):
+    def test_now_overnight_active_4pm_10am(self):
         self.clock_timer.on_time = '4:00pm'
         self.clock_timer.off_time = '10:00am'
         for i in range(10):
@@ -65,11 +77,11 @@ class TestClockTimer(BaseTestObject):
         for i in range(16, 24):
             self.current_hour = i
             self.clock_timer._check_timer()
-            self.assertTrue(self.output.active)
+            self.assertTrue(self.output.active, msg=i)
         for i in range(10):
             self.current_hour = i
             self.clock_timer._check_timer()
-            self.assertTrue(self.output.active)
+            self.assertTrue(self.output.active, msg=i)
 
     def test_now_during_day_before_overnight_activation(self):
         self.clock_timer.on_time = '4:00pm'
